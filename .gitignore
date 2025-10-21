@@ -1,3 +1,13 @@
+anotacoes.txt
+migrations/
+.env
+fin-track/__pycache__/*
+fin-track/migrations/*
+
+/apps/users/__pycache__/*
+/apps/users/migrations/*
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
