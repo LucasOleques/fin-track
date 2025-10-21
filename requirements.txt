@@ -4,7 +4,7 @@ django-filter==25.2
 djangorestframework==3.16.1
 Markdown==3.9
 Pillow==11.3.0
-psycopg==3.2.11
+psycopg2==2.9.11
 python-decouple==3.8
 sqlparse==0.5.3
 tzdata==2025.2
