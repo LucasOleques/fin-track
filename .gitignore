@@ -6,7 +6,8 @@ fin-track/migrations/*
 
 /apps/users/__pycache__/*
 /apps/users/migrations/*
-
+/apps/transactions/__pycache__/*
+/apps/transactions/migrations/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
