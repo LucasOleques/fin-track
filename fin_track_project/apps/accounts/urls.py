@@ -7,7 +7,7 @@ app_name = 'accounts'
 router = routers.DefaultRouter()
 router.register('', views.AccountViewSet, basename='accounts')
 
-urlspatterns = [
+urlpatterns = [
     path('', include(router.urls)),
     path('accounts/', views.AccountViewSet.as_view({'get':'list'}), name='accounts'),
 ]

@@ -5,4 +5,4 @@ from .serializer import UsersSerializer
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
-
+    print("Urls de usuários carregando")

@@ -34,7 +34,16 @@ fin-track/
 │   │   ├── serializers.py    # Serializadores DRF para usuários
 │   │   ├── urls.py           # Rotas URL específicas para usuários
 │   │   └── views.py          # Lógica de negócio (ViewSets) para usuários
-│   ├── transactions/         # Módulo de gestão de transações financeiras (ex: receitas, despesas)
+│   ├── accounts/             # Módulo de gestão de contas bancárias
+│   │   ├── migrations/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py         # Modelos de dados para contas
+│   │   ├── serializers.py    # Serializadores DRF para contas
+│   │   ├── urls.py           # Rotas URL específicas para contas
+│   │   └── views.py          # Lógica de negócio (ViewSets) para contas
+│   ├── transactions/         # Módulo de gestão de transações financeiras
 │   │   ├── migrations/
 │   │   ├── __init__.py
 │   │   ├── admin.py
@@ -43,7 +52,15 @@ fin-track/
 │   │   ├── serializers.py    # Serializadores DRF para transações
 │   │   ├── urls.py           # Rotas URL específicas para transações
 │   │   └── views.py          # Lógica de negócio (ViewSets) para transações
-│   └── ...                   # Outros módulos (categorias, contas, orçamentos, etc.)
+│   ├── categories/           # Módulo de gestão de categorias de transações
+│   │   ├── migrations/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py         # Modelos de dados para categorias
+│   │   ├── serializers.py    # Serializadores DRF para categorias
+│   │   ├── urls.py           # Rotas URL específicas para categorias
+│   │   └── views.py          # Lógica de negócio (ViewSets) para categorias
 ├── manage.py                 # Utilitário de linha de comando do Django
 ├── requirements.txt          # Dependências do projeto
 ├── .env.example              # Exemplo de arquivo de variáveis de ambiente
@@ -60,6 +77,16 @@ Principais endpoints da API RESTful para gestão financeira pessoal.
 | `POST` | `/api/users/login/` | Autentica um usuário e retorna um `Auth Token`. |
 | `GET` | `/api/users/{id}/` | Retorna os detalhes de um usuário específico. |
 | `PUT` | `/api/users/{id}/` | Atualiza todos os dados de um usuário. |
+| `DELETE` | `/api/users/{id}/` | Remove um usuário específico. |
+---
+
+### Contas (Accounts)
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| `POST` | `/api/accounts/` | Cria uma nova conta. |
+| `GET` | `/api/accounts/{id}/` | Retorna os detalhes de uma conta específica. |
+| `PUT` | `/api/accounts/{id}/` | Atualiza todos os dados de uma conta. |
+| `DELETE` | `/api/accounts/{id}/` | Remove uma conta específica. |
 ---
 
 ### Transações
@@ -69,6 +96,15 @@ Principais endpoints da API RESTful para gestão financeira pessoal.
 | `GET` | `/api/transactions/{id}/` | Retorna os detalhes de uma transação específica. |
 | `PUT` | `/api/transactions/{id}/` | Atualiza todos os dados de uma transação. |
 | `DELETE` | `/api/transactions/{id}/` | Remove uma transação específica. |
+---
+
+### Categorias (Categories)
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| `POST` | `/api/categories/` | Cria uma nova categoria. |
+| `GET` | `/api/categories/{id}/` | Retorna os detalhes de uma categoria específica. |
+| `PUT` | `/api/categories/{id}/` | Atualiza uma categoria. |
+| `DELETE` | `/api/categories/{id}/` | Remove uma categoria específica. |
 ---
 
 ## ⚙️ Como Iniciar (Developer Onboarding)
