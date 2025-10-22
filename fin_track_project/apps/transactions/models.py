@@ -1,13 +1,16 @@
 from django.db import models
 from users.models import Users
+from accounts.models import Account
+from categories.models import Categories
 
 class Transaction(models.Model):
-    users = models.ForeignKey(Users, on_delete=models.CASCADE)
-    is_open = models.BooleanField('Em aberto', default=False)
-    value_transaction = models.DecimalField('Valor', max_digits=10, decimal_places=2)
-    description = models.TextField('Descricao', max_length=100)
+    user = models.ForeignKey(Users, on_delete=models.PROTECT)
+    accounts = models.ForeignKey(Account, on_delete=models.CASCADE)
+    value_transaction = models.DecimalField('Valor Transação', max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
-    
+    categories = models.ForeignKey(Categories, on_delete=models.CASCADE)
+    description = models.TextField('Descricao', max_length=100)
+    type_transaction = models.CharField('Tipo Transação', max_length=50)
 
     class Meta:
         verbose_name = 'Transacao'
