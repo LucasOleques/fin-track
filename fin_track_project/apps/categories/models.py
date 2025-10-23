@@ -1,8 +1,8 @@
 from django.db import models
-from users.models import Users
+from user.models import User
 
 class Category(models.Model):
-    user=models.ForeignKey(Users, on_delete=models.PROTECT)
+    user=models.ForeignKey(User, on_delete=models.PROTECT)
     classification_transaction=models.TextField('Classificação', max_length=100)
 
     class Meta:

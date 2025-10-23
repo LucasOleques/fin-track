@@ -1,10 +1,10 @@
 from django.db import models
-from users.models import Users
+from user.models import User
 from accounts.models import Account
 from categories.models import Category
 
 class Transaction(models.Model):
-    user = models.ForeignKey(Users, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     accounts = models.ForeignKey(Account, on_delete=models.CASCADE)
     value_transaction = models.DecimalField('Valor Transação', max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)

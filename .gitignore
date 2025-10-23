@@ -4,8 +4,8 @@ migrations/
 fin-track/__pycache__/*
 fin-track/migrations/*
 
-/apps/users/__pycache__/*
-/apps/users/migrations/*
+/apps/user/__pycache__/*
+/apps/user/migrations/*
 /apps/account/__pycache__/*
 /apps/account/migrations/*
 /apps/transactions/__pycache__/*

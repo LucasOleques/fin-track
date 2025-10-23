@@ -25,7 +25,7 @@ fin-track/
 │   ├── urls.py               # Rotas URL globais da API
 │   └── wsgi.py               # Configuração WSGI para deploy
 ├── apps/
-│   ├── users/                # Módulo de gestão de usuários
+│   ├── user/                # Módulo de gestão de usuários
 │   │   ├── migrations/
 │   │   ├── __init__.py
 │   │   ├── admin.py
@@ -73,11 +73,11 @@ Principais endpoints da API RESTful para gestão financeira pessoal.
 ### Usuários
 | Método | Endpoint | Descrição |
 | --- | --- | --- |
-| `POST` | `/api/users/` | Registra um novo usuário no sistema. |
-| `POST` | `/api/users/login/` | Autentica um usuário e retorna um `Auth Token`. |
-| `GET` | `/api/users/{id}/` | Retorna os detalhes de um usuário específico. |
-| `PUT` | `/api/users/{id}/` | Atualiza todos os dados de um usuário. |
-| `DELETE` | `/api/users/{id}/` | Remove um usuário específico. |
+| `POST` | `/api/user/` | Registra um novo usuário no sistema. |
+| `POST` | `/api/user/login/` | Autentica um usuário e retorna um `Auth Token`. |
+| `GET` | `/api/user/{id}/` | Retorna os detalhes de um usuário específico. |
+| `PUT` | `/api/user/{id}/` | Atualiza todos os dados de um usuário. |
+| `DELETE` | `/api/user/{id}/` | Remove um usuário específico. |
 ---
 
 ### Contas (Accounts)

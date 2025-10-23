@@ -1,9 +1,9 @@
 from django.db import models
-from users.models import Users
+from user.models import User
 from categories.models import Category
 
 class Account(models.Model):
-    user = models.ForeignKey(Users, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name_bank = models.TextField('Banco', max_length=100)
     type_account = models.CharField('Tipo Conta', max_length=50)
