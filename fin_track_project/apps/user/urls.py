@@ -5,9 +5,8 @@ from . import views
 app_name = 'user'
 
 router = routers.DefaultRouter()
-router.register('', views.UserViewSet, basename='user')
+router.register(r'', views.UserViewSet, basename='user')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('user/', views.UserViewSet.as_view({'get': 'list'}), name='user'),
 ]

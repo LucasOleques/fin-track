@@ -1,14 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
-class User(models.Model):
-    name = models.CharField('Nome', max_length=50, unique=True)
-    password = models.CharField('Senha', max_length=50)
-    email = models.EmailField('Email', unique=True)
-    
+class User(AbstractUser):
+    # AbstractUser já recebe username, email, first_name e last_name
+    date_save = models.DateTimeField(auto_now_add=True)
     class Meta:
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
         ordering =['id']
 
     def __str__(self):
-        return self.name
+        return self.username
