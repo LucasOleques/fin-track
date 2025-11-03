@@ -5,9 +5,8 @@ from . import views
 app_name = 'transactions'
 
 router = routers.DefaultRouter()
-router.register('', views.TransactionViewSet, basename='transactions')
+router.register(r'', views.TransactionViewSet, basename='transactions')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('transactions/', views.TransactionViewSet.as_view({'get': 'list'}), name='transactions'),
 ]

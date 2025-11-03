@@ -25,19 +25,21 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=[], cast=list)
 # Application definition
 
 INSTALLED_APPS = [
+    'user.apps.UserConfig',
+    'accounts.apps.AccountsConfig',
+    'transactions.apps.TransactionsConfig',
+    'categories.apps.CategoriesConfig',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
-    'user.apps.UserConfig',
-    'accounts.apps.AccountsConfig',
-    'transactions.apps.TransactionsConfig',
-    'categories.apps.CategoriesConfig',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +133,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Adiciona o novo modelo de User criado de autenticação padrão do projeto.
+AUTH_USER_MODEL = 'user.User'
