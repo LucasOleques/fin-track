@@ -1,8 +1,6 @@
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import TokenAuthentication
 from .models import User
 from .serializer import UserSerializer
 
@@ -10,16 +8,9 @@ class UserViewSet(mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
     serializer_class = UserSerializer
     
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
 
-    def get_permissions(self):
-        if self.action == 'create':
-            return [AllowAny()]
-        return [IsAuthenticated()]
-
-    @action(detail=False, methods=['get', 'put', 'patch'], url_path='manage')
+    @action(detail=False, methods=['get', 'put', 'patch'], url_path='user', url_name='user')
     def manage(self, request):
         user = request.user
         if request.method == 'GET':

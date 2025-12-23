@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./fin_track_project/apps"
+    ]
+}
