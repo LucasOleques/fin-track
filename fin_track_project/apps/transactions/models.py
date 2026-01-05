@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from accounts.models import Account
 from categories.models import Category
 
@@ -22,4 +23,4 @@ class Transaction(models.Model):
         ordering = ['-date', '-value']
 
     def __str__(self):
-        return f"{self.description} - {self.amount}"
+        return f"{self.transaction_type} - {self.value}"
