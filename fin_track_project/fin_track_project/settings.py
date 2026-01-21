@@ -60,6 +60,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAdminUser',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
@@ -71,7 +72,7 @@ SIMPLE_JWT = {
 }
 
 # Configurando o User customizado
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'user.UserAdmin'
 
 ROOT_URLCONF = 'fin_track_project.urls'
 
