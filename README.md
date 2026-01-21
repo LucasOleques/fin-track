@@ -3,7 +3,7 @@
 Uma aplicação backend desenvolvida com Django e Django REST Framework (DRF) para o gerenciamento de finanças. O sistema conta com o gerenciamento de usuários, contas bancárias, transações financeiras e as categorias das transações.
 
 ## Funcionalidades de Negócio Implementadas
-* **Gestão Completa de Usuários:** Autenticação segura baseada em token e endpoints para CRUD de usuários.
+* **Gestão de Usuários:** Autenticação segura baseada em token e endpoints para CRUD de usuários.
 * **Controle de Transações Financeiras:** API para registro de receitas e despesas.
 * **Organização Financeira:** Suporte para categorização de transações e gerenciamento de múltiplas contas.
 * **Segurança e Isolamento de Dados:** Cada usuário só pode acessar e gerenciar seus próprios dados.
@@ -46,8 +46,8 @@ fin-track/
 └── README.md                 # Documentação principal do projeto
 ```
 
-## Documentação da API:
-Principais endpoints da API para gestão financeira pessoal.
+## Documentação:
+Principais endpoints da API:
 
 ### Users (Usuários)
 | Método | Endpoint | Descrição |
