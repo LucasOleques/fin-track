@@ -1,6 +1,6 @@
 # 🪙 Fin-Track: Gestão Financeira
 
-Uma aplicação backend desenvolvida com Django e Django REST Framework (DRF) para o gerenciamento de finanças. O sistema conta com o gerenciamento de usuários, contas bancárias, transações financeiras e as categorias das transações.
+Uma aplicação desenvolvida com Django e Django REST Framework (DRF) para o gerenciamento de finanças, integrando uma API RESTful e uma interface web responsiva. O sistema conta com o gerenciamento de usuários, contas bancárias, transações financeiras e as categorias das transações.
 
 ## Funcionalidades de Negócio Implementadas
 * **Gestão de Usuários:** Autenticação segura baseada em token e endpoints para CRUD de usuários.
@@ -12,7 +12,9 @@ Uma aplicação backend desenvolvida com Django e Django REST Framework (DRF) pa
 - **Python:** A linguagem de programação principal do projeto.
 - **Django:** O framework web principal da aplicação, gerenciando a lógica de negócio, modelos e rotas.
 - **Django REST Framework (DRF):** Toolkit essencial para a construção rápida e flexível de APIs RESTful, cuidando da serialização, autenticação e viewsets.
-- **PostgreSQL:** Um sistema de gerenciamento de banco de dados relacional.
+- **Bootstrap 5:** Framework CSS para a construção da interface web responsiva.
+- **SQLite:** Banco de dados relacional padrão para o ambiente de desenvolvimento.
+- **PostgreSQL:** Sistema de gerenciamento de banco de dados relacional (produção).
 - **JWT:** Para implementar autenticação segura baseada em tokens.
 - **django-filter:** Para permitir filtragem avançada e declarativa nos endpoints da API, facilitando a consulta de dados.
 - **python-decouple:** Para gerenciar variáveis de ambiente de forma segura, separando as configurações (como chaves de API e credenciais de banco de dados) do código-fonte.
@@ -36,6 +38,8 @@ fin-track/
 │   ├── urls.py               # Rotas URL globais da API
 │   ├── asgi.py               # Configuração ASGI para deploy (em andamento)
 │   ├── wsgi.py               # Configuração WSGI para deploy (em andamento)
+│   ├── static/               # Arquivos estáticos (CSS, JS)
+│   ├── templates/            # Templates HTML para a interface web
 │   └── apps/
 │       ├── user/                # Módulo de gestão de usuários
 │       ├── accounts/            # Módulo de gestão de contas bancárias
@@ -175,7 +179,11 @@ git push origin feature/nome-da-feature
 Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
-
+## Tecnologias Utilizadas
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0+-purple?style=for-the-badge&logo=bootstrap)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python)
 ![Django](https://img.shields.io/badge/Django-5.0+-green?style=for-the-badge&logo=django)
 ![Django REST Framework](https://img.shields.io/badge/Django_Rest_Framework-3.15-red?style=for-the-badge&logo=django)
