@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - FinTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Olá, {{ user.first_name|default:user.username }}!</h1>
+            <p class="text-muted mb-0">Resumo das suas finanças</p>
+        </div>
+        <div>
+            <a href="{% url 'transactions:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>Nova Transação
+            </a>
+        </div>
+    </div>
+    
+    <!-- Cards de Resumo -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-dashboard bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="card-subtitle mb-2 opacity-75">Saldo Total</p>
+                            <h3 class="card-title mb-0">R$ {{ total_balance|floatformat:2 }}</h3>
+                        </div>
+                        <div class="card-icon">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-dashboard bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="card-subtitle mb-2 opacity-75">Receitas (mês)</p>
+                            <h3 class="card-title mb-0">R$ {{ monthly_income|floatformat:2 }}</h3>
+                        </div>
+                        <div class="card-icon">
+                            <i class="bi bi-arrow-up-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-dashboard bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="card-subtitle mb-2 opacity-75">Despesas (mês)</p>
+                            <h3 class="card-title mb-0">R$ {{ monthly_expenses|floatformat:2 }}</h3>
+                        </div>
+                        <div class="card-icon">
+                            <i class="bi bi-arrow-down-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-dashboard bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="card-subtitle mb-2 opacity-75">Contas Ativas</p>
+                            <h3 class="card-title mb-0">{{ active_accounts }}</h3>
+                        </div>
+                        <div class="card-icon">
+                            <i class="bi bi-bank"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Minhas Contas -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-bank me-2"></i>Minhas Contas</h5>
+                    <a href="{% url 'user:profile' %}" class="btn btn-sm btn-outline-primary">Ver todas</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if accounts %}
+                        <ul class="list-group list-group-flush">
+                            {% for account in accounts %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-{{ account.icon|default:'credit-card' }} me-2 text-primary"></i>
+                                    <strong>{{ account.name }}</strong>
+                                    <small class="text-muted d-block">{{ account.bank }}</small>
+                                </div>
+                                <span class="{% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                    R$ {{ account.balance|floatformat:2 }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-bank text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">Nenhuma conta cadastrada</p>
+                            <a href="{% url 'accounts:create' %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-lg me-1"></i>Adicionar Conta
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Últimas Transações -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Últimas Transações</h5>
+                    <a href="{% url 'transactions:list' %}" class="btn btn-sm btn-outline-primary">Ver todas</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_transactions %}
+                        <ul class="list-group list-group-flush">
+                            {% for transaction in recent_transactions %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-{{ transaction.category.color|default:'secondary' }} me-2">
+                                        {{ transaction.category.name|default:'Sem categoria' }}
+                                    </span>
+                                    <strong>{{ transaction.description|truncatechars:30 }}</strong>
+                                    <small class="text-muted d-block">{{ transaction.date|date:"d/m/Y" }}</small>
+                                </div>
+                                <span class="{% if transaction.type == 'income' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                    {% if transaction.type == 'income' %}+{% else %}-{% endif %}
+                                    R$ {{ transaction.amount|floatformat:2 }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-receipt text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">Nenhuma transação registrada</p>
+                            <a href="{% url 'transactions:create' %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-lg me-1"></i>Nova Transação
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Categorias - FinTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Categorias</h1>
+            <p class="text-muted mb-0">Organize suas transações por categorias</p>
+        </div>
+        <a href="{% url 'categories:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Nova Categoria
+        </a>
+    </div>
+    
+    <!-- Tabs por Tipo -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#all">
+                <i class="bi bi-grid me-1"></i>Todas
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#expense">
+                <i class="bi bi-arrow-down-circle text-danger me-1"></i>Despesas
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#income">
+                <i class="bi bi-arrow-up-circle text-success me-1"></i>Receitas
+            </a>
+        </li>
+    </ul>
+    
+    <div class="tab-content">
+        <!-- Todas as Categorias -->
+        <div class="tab-pane fade show active" id="all">
+            {% if categories %}
+                <div class="row g-3">
+                    {% for category in categories %}
+                        {% include 'apps/categories/_category_card.html' %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% include 'apps/categories/_empty_state.html' %}
+            {% endif %}
+        </div>
+        
+        <!-- Categorias de Despesa -->
+        <div class="tab-pane fade" id="expense">
+            <div class="row g-3">
+                {% for category in categories %}
+                    {% if category.type == 'expense' or category.type == 'both' %}
+                        {% include 'apps/categories/_category_card.html' %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Categorias de Receita -->
+        <div class="tab-pane fade" id="income">
+            <div class="row g-3">
+                {% for category in categories %}
+                    {% if category.type == 'income' or category.type == 'both' %}
+                        {% include 'apps/categories/_category_card.html' %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modais de Exclusão -->
+{% for category in categories %}
+<div class="modal fade" id="deleteModal{{ category.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja excluir a categoria <strong>{{ category.name }}</strong>?</p>
+                {% if category.transaction_count > 0 %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Esta categoria possui <strong>{{ category.transaction_count }}</strong> transações associadas.
+                        As transações não serão excluídas, mas ficarão sem categoria.
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'categories:delete' category.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

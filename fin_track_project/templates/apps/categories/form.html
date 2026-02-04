@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nova{% endif %} Categoria - FinTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-{% if form.instance.pk %}pencil{% else %}plus-lg{% endif %} me-2"></i>
+                        {% if form.instance.pk %}Editar Categoria{% else %}Nova Categoria{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Nome -->
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">Nome *</label>
+                            <input type="text" 
+                                   class="form-control {% if form.name.errors %}is-invalid{% endif %}" 
+                                   id="id_name" 
+                                   name="name" 
+                                   value="{{ form.name.value|default:'' }}"
+                                   placeholder="Ex: Alimentação, Transporte, Salário"
+                                   required>
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Tipo -->
+                        <div class="mb-3">
+                            <label class="form-label">Tipo *</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="type" id="type_expense" 
+                                       value="expense" {% if form.type.value == 'expense' %}checked{% endif %}>
+                                <label class="btn btn-outline-danger" for="type_expense">
+                                    <i class="bi bi-arrow-down-circle me-1"></i>Despesa
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="type" id="type_income" 
+                                       value="income" {% if form.type.value == 'income' %}checked{% endif %}>
+                                <label class="btn btn-outline-success" for="type_income">
+                                    <i class="bi bi-arrow-up-circle me-1"></i>Receita
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="type" id="type_both" 
+                                       value="both" {% if form.type.value == 'both' or not form.type.value %}checked{% endif %}>
+                                <label class="btn btn-outline-info" for="type_both">
+                                    <i class="bi bi-arrows-expand me-1"></i>Ambos
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Cor -->
+                        <div class="mb-3">
+                            <label class="form-label">Cor</label>
+                            <div class="color-picker d-flex flex-wrap gap-2">
+                                {% for color in colors %}
+                                <div class="form-check form-check-inline m-0">
+                                    <input type="radio" class="btn-check" name="color" 
+                                           id="color_{{ color.value }}" value="{{ color.value }}"
+                                           {% if form.color.value == color.value %}checked{% endif %}>
+                                    <label class="color-option bg-{{ color.value }}" for="color_{{ color.value }}" 
+                                           title="{{ color.label }}"></label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Ícone -->
+                        <div class="mb-3">
+                            <label class="form-label">Ícone</label>
+                            <div class="icon-picker d-flex flex-wrap gap-2">
+                                {% for icon in icons %}
+                                <div class="form-check form-check-inline m-0">
+                                    <input type="radio" class="btn-check" name="icon" 
+                                           id="icon_{{ icon.value }}" value="{{ icon.value }}"
+                                           {% if form.icon.value == icon.value %}checked{% endif %}>
+                                    <label class="icon-option btn btn-outline-secondary" for="icon_{{ icon.value }}">
+                                        <i class="bi bi-{{ icon.value }}"></i>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Descrição -->
+                        <div class="mb-4">
+                            <label for="id_description" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="id_description" name="description" rows="2"
+                                      placeholder="Descrição opcional">{{ form.description.value|default:'' }}</textarea>
+                        </div>
+                        
+                        <!-- Botões -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>
+                                {% if form.instance.pk %}Salvar{% else %}Criar{% endif %}
+                            </button>
+                            <a href="{% url 'categories:list' %}" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .color-option {
+        display: block;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .color-option:hover {
+        transform: scale(1.1);
+    }
+    .btn-check:checked + .color-option {
+        border-color: #212529;
+        transform: scale(1.15);
+    }
+    
+    .icon-option {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-check:checked + .icon-option {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: white;
+    }
+</style>
+{% endblock %}

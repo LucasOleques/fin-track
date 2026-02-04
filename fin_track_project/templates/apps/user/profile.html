@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meu Perfil - FinTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <!-- Card do Perfil -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="profile-avatar mb-3">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="rounded-circle">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>Conta ativa
+                    </span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span><i class="bi bi-calendar3 me-2"></i>Membro desde</span>
+                        <strong>{{ user.date_joined|date:"d/m/Y" }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span><i class="bi bi-bank me-2"></i>Contas</span>
+                        <strong>{{ total_accounts }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span><i class="bi bi-arrow-left-right me-2"></i>Transações</span>
+                        <strong>{{ total_transactions }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <!-- Tabs de Configurações -->
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#dados">
+                                <i class="bi bi-person me-1"></i>Dados Pessoais
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#senha">
+                                <i class="bi bi-shield-lock me-1"></i>Alterar Senha
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- Tab Dados Pessoais -->
+                        <div class="tab-pane fade show active" id="dados">
+                            <form method="post" action="{% url 'user:profile_update' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="first_name" class="form-label">Nome</label>
+                                        <input type="text" class="form-control" id="first_name" 
+                                               name="first_name" value="{{ user.first_name }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="last_name" class="form-label">Sobrenome</label>
+                                        <input type="text" class="form-control" id="last_name" 
+                                               name="last_name" value="{{ user.last_name }}">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control" id="email" 
+                                           name="email" value="{{ user.email }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="avatar" class="form-label">Foto de Perfil</label>
+                                    <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i>Salvar Alterações
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Tab Alterar Senha -->
+                        <div class="tab-pane fade" id="senha">
+                            <form method="post" action="{% url 'user:password_change' %}">
+                                {% csrf_token %}
+                                
+                                <div class="mb-3">
+                                    <label for="old_password" class="form-label">Senha Atual</label>
+                                    <input type="password" class="form-control" id="old_password" 
+                                           name="old_password" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="new_password1" class="form-label">Nova Senha</label>
+                                    <input type="password" class="form-control" id="new_password1" 
+                                           name="new_password1" required>
+                                    <div class="form-text">Mínimo 8 caracteres.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="new_password2" class="form-label">Confirmar Nova Senha</label>
+                                    <input type="password" class="form-control" id="new_password2" 
+                                           name="new_password2" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-shield-check me-1"></i>Alterar Senha
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -5,7 +5,6 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = [
-            'user',
             'account',
             'category',
             'transaction_type',
@@ -14,7 +13,6 @@ class TransactionSerializer(serializers.ModelSerializer):
             'date',
             'created_at',
         ]
-        read_only_fields = ['user']
 
     # Validação customizada, o usuário não pode criar transação para conta de outro
     def validate_account(self, value):

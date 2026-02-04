@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Minhas Contas - FinTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Minhas Contas</h1>
+            <p class="text-muted mb-0">Gerencie suas contas bancárias e cartões</p>
+        </div>
+        <a href="{% url 'accounts:create' %}" class="btn btn-primary">Nova Conta</a>
+        <a href="{% url 'accounts:list' %}">Ver todas</a>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" class="form-control" name="q" 
+                           value="{{ request.GET.q }}" placeholder="Nome ou banco...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" name="type">
+                        <option value="">Todos</option>
+                        <option value="checking" {% if request.GET.type == 'checking' %}selected{% endif %}>Conta Corrente</option>
+                        <option value="savings" {% if request.GET.type == 'savings' %}selected{% endif %}>Poupança</option>
+                        <option value="credit" {% if request.GET.type == 'credit' %}selected{% endif %}>Cartão de Crédito</option>
+                        <option value="investment" {% if request.GET.type == 'investment' %}selected{% endif %}>Investimento</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="">Todos</option>
+                        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Ativas</option>
+                        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inativas</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-search me-1"></i>Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Lista de Contas -->
+    {% if accounts %}
+        <div class="row g-4">
+            {% for account in accounts %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 account-card {% if not account.is_active %}opacity-50{% endif %}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="account-icon bg-{{ account.color|default:'primary' }} text-white">
+                                <i class="bi bi-{{ account.icon|default:'bank' }}"></i>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'accounts:detail' account.id %}"> {{ account.bank }}
+                                            <i class="bi bi-eye me-2"></i>Ver detalhes
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'accounts:edit' account.id %}">
+                                            {{ account.bank }}
+                                            <i class="bi bi-pencil me-2"></i>Editar
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="#" 
+                                           data-bs-toggle="modal" data-bs-target="#deleteModal{{ account.id }}">
+                                            <i class="bi bi-trash me-2"></i>Excluir
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <h5 class="card-title mb-1">{{ account.name }}</h5>
+                        <p class="text-muted small mb-3">{{ account.bank }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-{{ account.type_color }}">
+                                {{ account.get_type_display }}
+                            </span>
+                            <h4 class="mb-0 {% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                R$ {{ account.balance|floatformat:2 }}
+                            </h4>
+                        </div>
+                        
+                        {% if account.credit_limit %}
+                        <div class="mt-3">
+                            <small class="text-muted">Limite disponível:</small>
+                            <div class="progress" style="height: 8px;">
+                                {% widthratio account.balance account.credit_limit 100 as used_percent %}
+                                <!-- <div class="progress-bar bg-warning" style="width: {{ used_percent|default:'0' }}%">
+                                </div>-->
+                            </div>
+                            <small class="text-muted">R$ {{ account.available_limit|floatformat:2 }} de R$ {{ account.credit_limit|floatformat:2 }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'accounts:detail' account.id %}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bi bi-arrow-right me-1"></i>Ver Transações
+                            {{ account.bank }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal de Exclusão -->
+            <div class="modal fade" id="deleteModal{{ account.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirmar Exclusão</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Tem certeza que deseja excluir a conta <strong>{{ account.name }}</strong>?</p>
+                            <p class="text-danger small">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Todas as transações associadas serão excluídas permanentemente.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form method="post" action="{% url 'accounts:delete' account.id %}" class="d-inline">
+                                {{ account.bank }}
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash me-1"></i>Excluir
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% include 'components/pagination.html' %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-bank text-muted" style="font-size: 4rem;"></i>
+            <h4 class="mt-3">Nenhuma conta encontrada</h4>
+            <p class="text-muted">Comece adicionando sua primeira conta bancária ou cartão.</p>
+            <a href="{% url 'accounts:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>Adicionar Conta
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

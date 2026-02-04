@@ -7,6 +7,24 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+# Web Views
+@login_required
+def categories_list_view(request):
+    list_categories = Category.objects.filter(user=request.user)
+    return render(request, 'apps/categories/list.html', {'list_categories': list_categories})
+
+@login_required
+def categories_create_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            Category.objects.create(user=request.user, name=name)
+    return render(request, 'apps/categories/create.html')
+
+# API ViewSet
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     authentication_classes = [JWTAuthentication]

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ account.name }} - FinTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'accounts:list' %}">Contas</a></li>
+            <li class="breadcrumb-item active">{{ account.name }}</li>
+        </ol>
+    </nav>
+    
+    <!-- Header da Conta -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="account-icon bg-{{ account.color|default:'primary' }} text-white me-3">
+                            <i class="bi bi-{{ account.icon|default:'bank' }}"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ account.name }}</h2>
+                            <p class="text-muted mb-0">{{ account.bank }} • {{ account.get_type_display }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <p class="text-muted mb-1">Saldo atual</p>
+                    <h2 class="{% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %} mb-0">
+                        R$ {{ account.balance|floatformat:2 }}
+                    </h2>
+                    {% if account.credit_limit %}
+                        <small class="text-muted">Limite: R$ {{ account.credit_limit|floatformat:2 }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent">
+            <div class="d-flex gap-2">
+                <a href="{% url 'transactions:create' %}?account={{ account.id }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i>Nova Transação
+                </a>
+                <a href="{% url 'accounts:edit' account.id %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-pencil me-1"></i>Editar
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros de Transações -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Período</label>
+                    <select class="form-select" name="period">
+                        <option value="">Todo período</option>
+                        <option value="7" {% if request.GET.period == '7' %}selected{% endif %}>Últimos 7 dias</option>
+                        <option value="30" {% if request.GET.period == '30' %}selected{% endif %}>Últimos 30 dias</option>
+                        <option value="90" {% if request.GET.period == '90' %}selected{% endif %}>Últimos 90 dias</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" name="type">
+                        <option value="">Todos</option>
+                        <option value="income" {% if request.GET.type == 'income' %}selected{% endif %}>Receitas</option>
+                        <option value="expense" {% if request.GET.type == 'expense' %}selected{% endif %}>Despesas</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Categoria</label>
+                    <select class="form-select" name="category">
+                        <option value="">Todas</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'d' %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-funnel me-1"></i>Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Lista de Transações -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Transações</h5>
+        </div>
+        {% if transactions %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th>Descrição</th>
+                            <th>Categoria</th>
+                            <th class="text-end">Valor</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.date|date:"d/m/Y" }}</td>
+                            <td>{{ transaction.description }}</td>
+                            <td>
+                                <span class="badge bg-{{ transaction.category.color|default:'secondary' }}">
+                                    {{ transaction.category.name|default:'Sem categoria' }}
+                                </span>
+                            </td>
+                            <td class="text-end {% if transaction.type == 'income' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                {% if transaction.type == 'income' %}+{% else %}-{% endif %}
+                                R$ {{ transaction.amount|floatformat:2 }}
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'transactions:edit' transaction.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal{{ transaction.id }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Modal de Exclusão -->
+                        <div class="modal fade" id="deleteModal{{ transaction.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Excluir transação "<strong>{{ transaction.description }}</strong>"?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form method="post" action="{% url 'transactions:delete' transaction.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Excluir</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                {% include 'components/pagination.html' %}
+            </div>
+        {% else %}
+            <div class="card-body text-center py-5">
+                <i class="bi bi-receipt text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">Nenhuma transação encontrada</p>
+                <a href="{% url 'transactions:create' %}?account={{ account.id }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i>Nova Transação
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
