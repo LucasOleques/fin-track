@@ -6,8 +6,6 @@ class AccountSerializer(serializers.ModelSerializer):
         model = Account
         fields = [
             'user',
-            'account',
-
             'bank',
             'account_type',
             'balance',
@@ -15,9 +13,3 @@ class AccountSerializer(serializers.ModelSerializer):
         ]
 
         read_only_fields = ['user']
-
-    def validate_account(self, value):
-        user = self.context['request'].user
-        if value.user != user:
-            raise serializers.ValidationError("Esta conta não pertence a você.")
-        return value
