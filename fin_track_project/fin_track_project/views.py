@@ -4,7 +4,7 @@ def base_view(request):
     if not request.user.is_authenticated:
         return render(request, 'apps/user/login.html')
     else:
-        return render(request, 'base.html')
+        return render(request, 'dashboard.html')
 
 def dashboard_view(request):
     return render(request, 'dashboard.html')
