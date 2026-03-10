@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from accounts.views import AccountViewSet, accounts_list_view, accounts_detail_view, accounts_create_view
 from transactions.views import TransactionViewSet, transactions_list_view, transactions_form_view
 from categories.views import CategoryViewSet
-from user.views import UserAdminViewSet, UserClientViewSet
+from user.views import AdminViewSet, ClientViewSet
 from .views import base_view, dashboard_view, footer_view, navbar_view, pagination_view
 
 # Rotas para a API usando DRF
@@ -14,8 +14,8 @@ router = DefaultRouter()
 router.register(r'accounts', AccountViewSet, basename='accounts')
 router.register(r'transactions', TransactionViewSet, basename='transactions')
 router.register(r'categories', CategoryViewSet, basename='categories')
-router.register(r'users', UserAdminViewSet, basename='users')
-router.register(r'clients', UserClientViewSet, basename='clients')
+router.register(r'users', AdminViewSet, basename='users')
+router.register(r'clients', ClientViewSet, basename='clients')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

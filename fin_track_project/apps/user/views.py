@@ -1,7 +1,6 @@
-from .models import UserAdmin, UserClient
-from .serializer import UserAdminSerializer, UserClientSerializer
+from .models import Admin, Client
+from .serializer import AdminSerializer, ClientSerializer
 
-from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -10,18 +9,44 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout as Logout
+from django.contrib import messages
 
 # Web Views
 def user_register_view(request):
+    if request.method == 'POST':
+        
+        nome = request.POST.get('client_name')
+        email = request.POST.get('client_email')
+        senha = request.POST.get('password')
+        confirmacao = request.POST.get('password_confirm')
+
+        if senha != confirmacao:
+            messages.error(request, "As senhas não conferem!")
+            return render(request, 'apps/user/register.html')
+
+        serializer = ClientSerializer(data={
+            'user': None,
+            'client_name': nome,
+            'client_email': email,
+            'password': senha
+        })
+
+        if serializer.is_valid():
+            serializer.save()
+            messages.success(request, "Cadastro realizado com sucesso!")
+            return redirect('user:login')
+        else:
+            for field_errors in serializer.errors.values():
+                for error in field_errors:
+                    messages.error(request, error)
+
     return render(request, 'apps/user/register.html')
 
 @login_required
 def user_profile_view(request):
-    if not request.user.is_authenticated:
-        return render(request, 'apps/user/profile.html', {'error': 'Usuário não autenticado.'})
     user = request.user
     context = {
         'username': user.username,
@@ -30,6 +55,12 @@ def user_profile_view(request):
         'last_name': user.last_name,
     }
     return render(request, 'apps/user/profile.html', context)
+
+def user_profile_update(request):
+    return render(request, 'apps/user/profile.html')
+
+def user_password_change(request):
+    return render(request, 'apps/user/profile.html')
 
 def user_password_reset_view(request):
     return redirect('user:login')
@@ -41,20 +72,33 @@ def user_logout_view(request):
 
 def user_login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
+        # Permite login por e-mail ou username
+        data = request.POST.copy()
+        username = data.get('username')
+
+        if username and '@' in username:
+            User = get_user_model()
+            try:
+                user = User.objects.get(email=username)
+                data['username'] = user.username
+            except User.DoesNotExist:
+                pass
+
+        username_or_email = AuthenticationForm(request, data=data)
+        if username_or_email.is_valid():
+            user = username_or_email.get_user()
             login(request, user)
             if not request.POST.get('remember'):
                 request.session.set_expiry(0)
-            return redirect('accounts:list')
+            return render(request, 'dashboard.html', {'username_or_email': username_or_email})
     else:
-        form = AuthenticationForm()
-    return render(request, 'apps/user/login.html', {'form': form})
+        username_or_email = AuthenticationForm()
+    return render(request, 'apps/user/login.html', {'username_or_email': username_or_email})
 
 # API ViewSets
-class UserAdminViewSet(viewsets.GenericViewSet):
-    serializer_class = UserAdminSerializer
+class AdminViewSet(viewsets.GenericViewSet):
+    queryset = Admin.objects.all()
+    serializer_class = AdminSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
@@ -65,26 +109,20 @@ class UserAdminViewSet(viewsets.GenericViewSet):
         'is_active'
         ]
     
-    @action(methods=['post'], detail=False, permission_classes=[IsAdminUser])
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        
-    @action(methods=['get'], detail=False, permission_classes=[IsAuthenticated, IsAdminUser])
-    def get_queryset(self):
-        return UserAdmin.objects.all() & UserClient.objects.all()
 
-    @action(methods=['put'], detail=True, permission_classes=[IsAuthenticated, IsAdminUser])
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(methods=['delete'], detail=True, permission_classes=[IsAuthenticated, IsAdminUser])
     def perform_destroy(self, instance):
         instance.delete()
 
 # API ViewSets
-class UserClientViewSet(viewsets.GenericViewSet):
-    serializer_class = UserClientSerializer
-    authentication_classes = []
+class ClientViewSet(viewsets.GenericViewSet):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+    authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]
 
     filter_backends = [DjangoFilterBackend]
@@ -93,20 +131,12 @@ class UserClientViewSet(viewsets.GenericViewSet):
         'client_email',
         'user__username'
         ]
-    
-    @action(methods=['post'], detail=False, permission_classes=[AllowAny])
     def perform_create(self, serializer):
         user = self.request.user if self.request.user.is_authenticated else None
         serializer.save(user=user)
-
-    @action(methods=['get'], detail=False, authentication_classes=[JWTAuthentication], permission_classes=[IsAuthenticated])
-    def get_queryset(self):
-        return UserClient.objects.all()
     
-    @action(methods=['put'], detail=True, authentication_classes=[JWTAuthentication], permission_classes=[IsAuthenticated])
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(methods=['delete'], detail=True, authentication_classes=[JWTAuthentication], permission_classes=[IsAuthenticated])
     def perform_destroy(self, instance):
         instance.delete()

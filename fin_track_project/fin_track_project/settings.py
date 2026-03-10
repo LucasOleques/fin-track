@@ -72,7 +72,7 @@ SIMPLE_JWT = {
 }
 
 # Configurando o User customizado
-AUTH_USER_MODEL = 'user.UserAdmin'
+AUTH_USER_MODEL = 'user.Admin'
 
 ROOT_URLCONF = 'fin_track_project.urls'
 

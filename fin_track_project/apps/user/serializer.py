@@ -1,9 +1,9 @@
-from .models import UserAdmin, UserClient
+from .models import Admin, Client
 from rest_framework import serializers
 
-class UserAdminSerializer(serializers.ModelSerializer):
+class AdminSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserAdmin
+        model = Admin
         fields = [
             'id',
             'username',
@@ -18,37 +18,21 @@ class UserAdminSerializer(serializers.ModelSerializer):
             'password': {'write_only': True, 'min_length': 8}
         }
 
-    def create(self, validated_data):
-        UserAdmin = UserAdmin.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-            first_name=validated_data.get('first_name', ''),
-            last_name=validated_data.get('last_name', '')
-            # date_save ñ precisa ser passado em create
-        )
-        return UserAdmin
-
-class UserClientSerializer(serializers.ModelSerializer):
+class ClientSerializer(serializers.ModelSerializer):
+    client_email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'}, min_length=8)
 
     class Meta:
-        model = UserClient
+        model = Client
         fields = [
-            'id',
+            'id_client',
             'user',
             'client_name',
             'client_email',
+            'password',
             'date_save',
         ]
+        read_only_fields = ('id_client', 'user', 'date_save')
         extra_kwargs = {
             'password': {'write_only': True, 'min_length': 8}
         }
-
-    def create(self, validated_data):
-        UserClient = UserClient.objects.create_user(
-            user=validated_data['user'],
-            client_name=validated_data['client_name'],
-            client_email=validated_data['client_email'],
-            password=validated_data['password']
-        )
-        return UserClient
