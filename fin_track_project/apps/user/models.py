@@ -15,8 +15,6 @@ class Admin(AbstractUser):
     
 class Client(models.Model):
     id_client = models.AutoField(primary_key=True)
-    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='clients', help_text='Usuario admin associado ao cliente')
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='client_profile')
     client_name = models.CharField(max_length=255, help_text='Nome do cliente')
     client_email = models.EmailField(max_length=255, unique=True, help_text='Email do cliente')
     password = models.CharField(max_length=50, help_text='Senha do cliente')

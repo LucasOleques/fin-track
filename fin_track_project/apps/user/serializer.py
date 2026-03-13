@@ -26,13 +26,12 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields = [
             'id_client',
-            'user',
             'client_name',
             'client_email',
             'password',
             'date_save',
         ]
-        read_only_fields = ('id_client', 'user', 'date_save')
+        read_only_fields = ('id_client', 'date_save')
         extra_kwargs = {
             'password': {'write_only': True, 'min_length': 8}
         }
