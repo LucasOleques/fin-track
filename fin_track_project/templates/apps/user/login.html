@@ -32,7 +32,7 @@
                 <input type="text" 
                        class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
                        id="id_username" 
-                       name="username" 
+                       name="username"
                        value="{{ form.username.value|default:'' }}"
                        placeholder="Digite seu usuário ou e-mail"
                        required>
@@ -84,20 +84,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.getElementById('togglePassword').addEventListener('click', function() {
-        const passwordInput = document.getElementById('id_password');
-        const icon = this.querySelector('i');
-        
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('bi-eye');
-            icon.classList.add('bi-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('bi-eye-slash');
-            icon.classList.add('bi-eye');
-        }
-    });
-</script>
+    <script src="{% static 'js/apps/user/login.js' %}"></script>
 {% endblock %}
