@@ -1,11 +1,24 @@
 @echo off
 
+REM Diretorio base do script
+set SCRIPT_DIR=%~dp0
+set PROJECT_ROOT=%SCRIPT_DIR%..
+
+echo Diretorio do projeto: %PROJECT_ROOT%
+
 echo Ativando ambiente virtual...
-call C:\Users\lucas\miniconda3\Scripts\activate
-call conda activate fin-track
+
+REM Tenta usar conda do PATH (mais generico)
+call conda activate fin-track 2>nul
+if errorlevel 1 (
+    echo Conda falhou, tentando venv...
+    call %PROJECT_ROOT%\.venv\Scripts\activate
+)
+
 echo Ambiente ativado.
 
-cd C:\Users\lucas\IdeaProjects VSCode\fin-track\fin_track_project
+REM Ir para o projeto
+cd /d %PROJECT_ROOT%\fin_track_project
 
 echo Executando makemigrations do Django...
 python manage.py makemigrations user transactions categories accounts
@@ -15,10 +28,6 @@ python manage.py migrate
 
 echo Migracoes realizadas e Banco de dados criado.
 
-cd C:\Users\lucas\IdeaProjects VSCode\fin-track\fin_track_project
-
 echo Criando usuario Admin...
 set DJANGO_SUPERUSER_PASSWORD=admin
 python manage.py createsuperuser --username admin --email admin@admin.com --noinput
-
-echo Usuario Admin criado com sucesso.
