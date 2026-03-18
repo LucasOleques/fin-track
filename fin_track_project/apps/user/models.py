@@ -15,9 +15,10 @@ class Admin(AbstractUser):
     
 class Client(models.Model):
     id_client = models.AutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='clients')
     client_name = models.CharField(max_length=255, help_text='Nome do cliente')
     client_email = models.EmailField(max_length=255, unique=True, help_text='Email do cliente')
-    password = models.CharField(max_length=50, help_text='Senha do cliente')
+    password = models.CharField(max_length=128, help_text='Senha do cliente')
     date_save = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -27,3 +28,4 @@ class Client(models.Model):
 
     def __str__(self):
         return self.client_name
+    
