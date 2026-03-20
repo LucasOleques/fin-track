@@ -67,18 +67,12 @@
                             <form method="post" action="{% url 'user:profile_update' %}" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="first_name" class="form-label">Nome</label>
-                                        <input type="text" class="form-control" id="first_name" 
-                                               name="first_name" value="{{ user.first_name }}">
+                                <div class="mb-3">
+                                        <label for="id_username" class="form-label">Nome</label>
+                                        <input type="text" class="form-control" id="id_username" 
+                                        name="username"
+                                        value="{{ user.username }}">
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="last_name" class="form-label">Sobrenome</label>
-                                        <input type="text" class="form-control" id="last_name" 
-                                               name="last_name" value="{{ user.last_name }}">
-                                    </div>
-                                </div>
                                 
                                 <div class="mb-3">
                                     <label for="email" class="form-label">E-mail</label>

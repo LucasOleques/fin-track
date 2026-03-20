@@ -10,9 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
-from django.http import HttpResponse
 
 from logs.audit_logger import registrar_log
 
@@ -46,47 +44,51 @@ class ClientViewSet(viewsets.GenericViewSet):
     def user_login_view(request):
         if request.method == 'POST':
             username_or_email = request.POST.get('username')
-            password = request.POST.get('password')
+            password_auth = request.POST.get('password')
 
-            user = None
-
-            if username_or_email and '@' in username_or_email:
-                user_email = Admin.objects.get(email=username_or_email)
-                try:
-                    user = authenticate(request, username=user_email.username, password=password)
-
+            try:
+                if username_or_email and '@' in username_or_email:
+                    user_email = Admin.objects.filter(email=username_or_email).first()
+                    if not user_email:
+                        messages.error(request, "Usuário ou senha inválidos.")
+                        return render(request, 'apps/user/login.html')
+                    user = authenticate(request, username=user_email.username, password=password_auth)
                     if user:
                         login(request, user)
+                        # registrar_log(username_or_email, "LOGIN_SUCCESS", "Login com e-mail realizado")
                         messages.success(request, "Login realizado.")
-
-                        registrar_log(user.username, "Login com e-mail", "Usuário fez login com e-mail.")
                         return redirect('dashboard')
                     else:
-                        messages.error(request, "Senha inválida.")
-                except Client.DoesNotExist:
-                    messages.error(request, "Credenciais inválidas."+ str(user) + " - " + str(username_or_email))
-                    pass
-                
-            elif username_or_email is not None:
-                user_username = Admin.objects.get(username=username_or_email)
-                try:
-                    user = authenticate(request, username=user_username.username, password=password)
+                        # registrar_log(username_or_email, "LOGIN_FAIL", "Senha incorreta (email)")
+                        messages.error(request, "Usuário ou senha inválidos.")
+                        return render(request, 'apps/user/login.html')
 
+                else:
+                    user_username = Admin.objects.filter(username=username_or_email).first()
+                    if not user_username:
+                        # registrar_log(username_or_email, "LOGIN_FAIL", "Username não encontrado")
+                        messages.error(request, "Usuário ou senha inválidos.")
+                        return render(request, 'apps/user/login.html')
+                    # registrar_log(username_or_email, "LOGIN", "Username encontrado")
+                    user = authenticate(request, username=user_username.username, password=password_auth)
                     if user:
                         login(request, user)
+                        # registrar_log(username_or_email, "LOGIN_SUCCESS", "Login com username realizado")
                         messages.success(request, "Login realizado.")
-                        registrar_log(user.username, "Login com username", "Usuário fez login com username.")
                         return redirect('dashboard')
-                    
-                except Client.DoesNotExist:
-                    messages.error(request, "Credenciais inválidas."+ str(user) + " - " + str(username_or_email))
-                    pass
+                    else:
+                        # registrar_log(username_or_email, "LOGIN_FAIL", "Senha incorreta (username)")
+                        messages.error(request, "Usuário ou senha inválidos.")
+                        return render(request, 'apps/user/login.html')
 
-            else:
-                messages.error(request, "Email ou User Credenciais inválidas. " + str(user) + " - " + str(username_or_email))
-                registrar_log(username_or_email, "Falha de Login", "Tentativa de login com credenciais inválidas.")
+            except Exception as e:
+                registrar_log(
+                    username_or_email,
+                    "LOGIN_ERROR",
+                    f"Erro inesperado: {str(e)}"
+                )
+                messages.error(request, "Usuário ou senha inválidos.")
 
-            messages.error(request, "Algo inesperado. Entre em contato com o suporte do sistema. " + str(user) + " - " + str(username_or_email))
         return render(request, 'apps/user/login.html')
     
     @login_required
@@ -96,7 +98,7 @@ class ClientViewSet(viewsets.GenericViewSet):
             username = user.username if user.is_authenticated else "Anônimo"
             registrar_log(username, "Logout", "Usuário fez logout.")
         except Exception as e:
-            print(f"Erro ao registrar logout: {e}")
+            registrar_log(username, "Logout", f"Erro ao registrar logout: {e}")
         if logout(request):
             messages.success(request, "Logout realizado.")
         return redirect('user:login')
@@ -104,17 +106,32 @@ class ClientViewSet(viewsets.GenericViewSet):
     @login_required
     def user_password_change(request):
         if request.method == 'POST':
-            form = PasswordChangeForm(request.user, request.POST)
-            if form.is_valid():
-                user = form.save()
-                update_session_auth_hash(request, user)
-                messages.success(request, 'Sua senha foi alterada com sucesso!')
+            user = request.user
+
+            old_password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+            confirm = request.POST.get('confirm_new_password')
+
+            if not user.check_password(old_password):
+                messages.error(request, 'Senha atual incorreta!')
                 return redirect('user:profile')
-            else:
-                for field, error_list in form.errors.items():
-                    for error in error_list:
-                        messages.error(request, f"{error}")
-        
+
+            if new_password != confirm:
+                messages.error(request, 'As senhas não conferem!')
+                return redirect('user:profile')
+
+            if len(new_password) < 8:
+                messages.error(request, 'A senha deve ter no mínimo 8 caracteres.')
+                return redirect('user:profile')
+
+            user.set_password(new_password)
+            user.save()
+
+            update_session_auth_hash(request, user)
+
+            messages.success(request, 'Senha alterada com sucesso!')
+            return redirect('user:profile')
+
         return redirect('user:profile')
 
     def user_password_reset_view(request):
