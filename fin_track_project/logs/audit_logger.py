@@ -15,7 +15,7 @@ if not logger.handlers:
     
     # Formato: DATA | USUÁRIO | AÇÃO | DETALHES
     formatter = logging.Formatter(
-        'DATA: %(asctime)s | USUÁRIO: %(user_identifier)s | AÇÃO: %(action_name)s | DETALHES: %(details)s',
+         'DATA: %(asctime)s \nUSUÁRIO: %(user_identifier)s \nAÇÃO: %(action_name)s \nDETALHES: %(details)s \n=======================================\n',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     
