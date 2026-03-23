@@ -1,18 +1,20 @@
 from .models import Admin, Client
 from .serializer import AdminSerializer, ClientSerializer
 
-from rest_framework import viewsets, renderers
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 
 from logs.audit_logger import registrar_log
+import base64
 
 # API ViewSets
 class AdminViewSet(viewsets.GenericViewSet):
@@ -104,7 +106,7 @@ class ClientViewSet(viewsets.GenericViewSet):
         return redirect('user:login')
     
     @login_required
-    def user_password_change(request):
+    def user_password_change_view(request):
         if request.method == 'POST':
             user = request.user
 
@@ -114,15 +116,15 @@ class ClientViewSet(viewsets.GenericViewSet):
 
             if not user.check_password(old_password):
                 messages.error(request, 'Senha atual incorreta!')
-                return redirect('user:profile')
+                return redirect(f"{reverse('user:profile')}#senha")
 
             if new_password != confirm:
                 messages.error(request, 'As senhas não conferem!')
-                return redirect('user:profile')
+                return redirect(f"{reverse('user:profile')}#senha")
 
             if len(new_password) < 8:
                 messages.error(request, 'A senha deve ter no mínimo 8 caracteres.')
-                return redirect('user:profile')
+                return redirect(f"{reverse('user:profile')}#senha")
 
             user.set_password(new_password)
             user.save()
@@ -132,10 +134,7 @@ class ClientViewSet(viewsets.GenericViewSet):
             messages.success(request, 'Senha alterada com sucesso!')
             return redirect('user:profile')
 
-        return redirect('user:profile')
-
-    def user_password_reset_view(request):
-        return render(request, 'apps/user/password_reset.html')
+        return redirect(f"{reverse('user:profile')}#senha")
     
     def user_register_view(request):
         if request.method == 'POST':
@@ -144,6 +143,7 @@ class ClientViewSet(viewsets.GenericViewSet):
             email = request.POST.get('client_email')
             password = request.POST.get('password')
             confirmacao = request.POST.get('password_confirm')
+            avatar = request.FILES.get('avatar')
 
             if password != confirmacao:
                 messages.error(request, "As senhas não conferem!")
@@ -152,7 +152,8 @@ class ClientViewSet(viewsets.GenericViewSet):
             serializer = ClientSerializer(data={
                 'client_name': username,
                 'client_email': email,
-                'password': password
+                'password': password,
+                'avatar' : avatar
             })
 
             if serializer.is_valid():
@@ -175,7 +176,15 @@ class ClientViewSet(viewsets.GenericViewSet):
     @login_required
     def user_profile_view(request):
         user = request.user
+        avatar_base64 = None
+        
+        if user.avatar:
+            # Converte o binário para base64 para o HTML
+            avatar_base64 = base64.b64encode(user.avatar).decode('utf-8')
+
         context = {
+            'user': user,
+            'avatar_base64': avatar_base64,
             'username': user.username,
             'email': user.email,
             'first_name': user.first_name,
@@ -183,5 +192,33 @@ class ClientViewSet(viewsets.GenericViewSet):
         }
         return render(request, 'apps/user/profile.html', context)
 
-    def user_profile_update(request):
-        return render(request, 'apps/user/profile.html')
+    @login_required
+    def user_profile_update_view(request):
+        if request.method == 'POST':
+            user = request.user
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            avatar_file = request.FILES.get('avatar')
+
+            user.username = username
+            user.email = email
+            
+            if avatar_file:
+                user.avatar = avatar_file.read()
+            
+            user.save()
+
+            client = getattr(user, 'clients', None)
+            if client:
+                client_update = user.clients.first() 
+                if client_update:
+                    client_update.client_name = username
+                    client_update.client_email = email
+                    if avatar_file:
+                        client_update.avatar = user.avatar
+                    client_update.save()
+
+            messages.success(request, "Perfil atualizado com sucesso.")
+            return redirect('user:profile')
+
+        return redirect('user:profile')

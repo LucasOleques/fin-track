@@ -4,6 +4,11 @@
 {% block title %}Meu Perfil - FinTrack{% endblock %}
 
 {% block content %}
+
+{% block extra_js %}
+    <script src="{% static 'js/apps/user/profile.js' %}"></script>
+{% endblock %}
+
 <div class="container py-4">
     <div class="row">
         <div class="col-lg-4 mb-4">
@@ -11,8 +16,10 @@
             <div class="card">
                 <div class="card-body text-center">
                     <div class="profile-avatar mb-3">
-                        {% if user.profile.avatar %}
-                            <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="rounded-circle">
+                        {% if avatar_base64 %}
+                            <img src="data:image/jpeg;base64,{{ avatar_base64 }}"
+                                class="rounded-circle"
+                                style="width: 150px; height: 150px; object-fit: cover;">
                         {% else %}
                             <div class="avatar-placeholder">
                                 <i class="bi bi-person-fill"></i>
@@ -79,10 +86,10 @@
                                     <input type="email" class="form-control" id="email" 
                                            name="email" value="{{ user.email }}">
                                 </div>
-                                
+
                                 <div class="mb-3">
-                                    <label for="avatar" class="form-label">Foto de Perfil</label>
-                                    <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                                        <label for="avatar" class="form-label">Foto de Perfil</label>
+                                        <input type="file" class="form-control" id="avatar" name="avatar">
                                 </div>
                                 
                                 <button type="submit" class="btn btn-primary">
@@ -93,7 +100,7 @@
                         
                         <!-- Tab Alterar Senha -->
                         <div class="tab-pane fade" id="senha">
-                            <form method="post" action="{% url 'user:password_change' %}">
+                            <form method="post" action="{% url 'user:password_change' %}" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 
                                 <div class="mb-3">

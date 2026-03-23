@@ -5,6 +5,7 @@ from django.conf import settings
 # AbstractUser já recebe username, email, first_name e last_name
 class Admin(AbstractUser):
     date_save = models.DateTimeField(auto_now_add=True)
+    avatar = models.BinaryField(null=True, blank=True)
     class Meta:
         verbose_name = 'Usuario Admin'
         verbose_name_plural = 'Usuarios Admins'
@@ -20,6 +21,7 @@ class Client(models.Model):
     client_email = models.EmailField(max_length=255, unique=True, help_text='Email do cliente')
     password = models.CharField(max_length=128, help_text='Senha do cliente')
     date_save = models.DateTimeField(auto_now_add=True)
+    avatar = models.BinaryField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Usuario Cliente'
