@@ -3,8 +3,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from accounts.views import AccountViewSet, accounts_list_view, accounts_detail_view, accounts_create_view
-from transactions.views import TransactionViewSet, transactions_list_view, transactions_form_view
+from accounts.views import AccountViewSet
+from transactions.views import TransactionViewSet
 from categories.views import CategoryViewSet
 from user.views import AdminViewSet, ClientViewSet
 from .views import base_view, dashboard_view, footer_view, navbar_view, pagination_view
