@@ -19,8 +19,7 @@ router.register(r'clients', ClientViewSet, basename='clients')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    path('', include('django.contrib.auth.urls')),
+    # path('', include('django.contrib.auth.urls')),
     
     # Rotas de Autenticação JWT
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
