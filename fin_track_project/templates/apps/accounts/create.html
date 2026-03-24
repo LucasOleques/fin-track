@@ -33,7 +33,7 @@
                                    id="id_name" 
                                    name="name" 
                                    value="{{ form.name.value|default:'' }}"
-                                   placeholder="Ex: Conta Principal, Cartão Nubank"
+                                   placeholder="Ex: Conta Principal, Cartão Nubank..."
                                    required>
                             {% if form.name.errors %}
                                 <div class="invalid-feedback">
@@ -49,7 +49,7 @@
                                    id="id_bank" 
                                    name="bank" 
                                    value="{{ form.bank.value|default:'' }}"
-                                   placeholder="Ex: Banco do Brasil, Nubank, Inter"
+                                   placeholder="Ex: Banco do Brasil, Nubank, Inter..."
                                    required>
                             {% if form.bank.errors %}
                                 <div class="invalid-feedback">
@@ -64,11 +64,11 @@
                                 <select class="form-select {% if form.type.errors %}is-invalid{% endif %}" 
                                         id="id_type" name="type" required>
                                     <option value="">Selecione...</option>
-                                    <option value="checking" {% if form.type.value == 'checking' %}selected{% endif %}>Conta Corrente</option>
-                                    <option value="savings" {% if form.type.value == 'savings' %}selected{% endif %}>Poupança</option>
-                                    <option value="credit" {% if form.type.value == 'credit' %}selected{% endif %}>Cartão de Crédito</option>
-                                    <option value="investment" {% if form.type.value == 'investment' %}selected{% endif %}>Investimento</option>
-                                    <option value="wallet" {% if form.type.value == 'wallet' %}selected{% endif %}>Carteira</option>
+                                    <option value="corrente" {% if form.type.value == 'corrente' %}selected{% endif %}>Conta Corrente</option>
+                                    <option value="poupanca" {% if form.type.value == 'poupanca' %}selected{% endif %}>Poupança</option>
+                                    <option value="cartao" {% if form.type.value == 'cartao' %}selected{% endif %}>Cartão de Crédito</option>
+                                    <option value="investimento" {% if form.type.value == 'investimento' %}selected{% endif %}>Investimento</option>
+                                    <option value="dinheiro" {% if form.type.value == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
                                 </select>
                                 {% if form.type.errors %}
                                     <div class="invalid-feedback">
@@ -76,8 +76,26 @@
                                     </div>
                                 {% endif %}
                             </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="account_color" class="form-label">Cor</label>
+                            <select class="form-select {% if form.account_color.errors %}is-invalid{% endif %}" id="account_color" name="account_color">
+                                <option value="">Selecione...</option>
+                                <option value="primary" {% if form.color.value == 'primary' %}selected{% endif %}>Azul</option>
+                                <option value="success" {% if form.color.value == 'success' %}selected{% endif %}>Verde</option>
+                                <option value="danger" {% if form.color.value == 'danger' %}selected{% endif %}>Vermelho</option>
+                                <option value="warning" {% if form.color.value == 'warning' %}selected{% endif %}>Amarelo</option>
+                                <option value="info" {% if form.color.value == 'info' %}selected{% endif %}>Ciano</option>
+                                <option value="secondary" {% if form.color.value == 'secondary' %}selected{% endif %}>Cinza</option>
+                            </select>
+                            {% if form.type.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.type.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                             
-                            <div class="col-md-6 mb-3">
+                            <div class="mb-3">
                                 <label for="id_balance" class="form-label">Saldo Inicial *</label>
                                 <div class="input-group">
                                     <span class="input-group-text">R$</span>
@@ -97,6 +115,7 @@
                             </div>
                         </div>
                         
+                        
                         <div class="mb-3" id="credit_limit_group" style="display: none;">
                             <label for="id_credit_limit" class="form-label">Limite do Cartão</label>
                             <div class="input-group">
@@ -105,22 +124,10 @@
                                        class="form-control" 
                                        id="id_credit_limit" 
                                        name="credit_limit" 
-                                       value="{{ form.credit_limit.value|default:'' }}"
+                                       value="{{ form.credit_limit.value|default:'0.00' }}"
                                        step="0.01"
                                        min="0">
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="id_color" class="form-label">Cor</label>
-                            <select class="form-select" id="id_color" name="color">
-                                <option value="primary" {% if form.color.value == 'primary' %}selected{% endif %}>Azul</option>
-                                <option value="success" {% if form.color.value == 'success' %}selected{% endif %}>Verde</option>
-                                <option value="danger" {% if form.color.value == 'danger' %}selected{% endif %}>Vermelho</option>
-                                <option value="warning" {% if form.color.value == 'warning' %}selected{% endif %}>Amarelo</option>
-                                <option value="info" {% if form.color.value == 'info' %}selected{% endif %}>Ciano</option>
-                                <option value="secondary" {% if form.color.value == 'secondary' %}selected{% endif %}>Cinza</option>
-                            </select>
                         </div>
                         
                         <div class="mb-4 form-check">
@@ -147,19 +154,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    const typeSelect = document.getElementById('id_type');
-    const creditLimitGroup = document.getElementById('credit_limit_group');
-    
-    function toggleCreditLimit() {
-        if (typeSelect.value === 'credit') {
-            creditLimitGroup.style.display = 'block';
-        } else {
-            creditLimitGroup.style.display = 'none';
-        }
-    }
-    
-    typeSelect.addEventListener('change', toggleCreditLimit);
-    toggleCreditLimit(); // Executa ao carregar
-</script>
+    <script src="{% static 'js/apps/accounts/create.js' %}"></script>
 {% endblock %}
+

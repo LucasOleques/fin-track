@@ -5,11 +5,19 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = [
+            'id_account',
             'user',
+            'name',
             'bank',
-            'account_type',
+            'type',
+            'account_color',
             'balance',
-            'active',
+            'credit_limit',
+            'is_active',
         ]
 
-        read_only_fields = ['user']
+        read_only_fields = ['id_account','user']
+
+    def create(self, validated_data):
+        account = Account.objects.create(**validated_data)
+        return account

@@ -12,7 +12,6 @@
             <p class="text-muted mb-0">Gerencie suas contas bancárias e cartões</p>
         </div>
         <a href="{% url 'accounts:create' %}" class="btn btn-primary">Nova Conta</a>
-        <a href="{% url 'accounts:list' %}">Ver todas</a>
     </div>
     
     <!-- Filtros -->
@@ -21,25 +20,26 @@
             <form method="get" class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Buscar</label>
-                    <input type="text" class="form-control" name="q" 
-                           value="{{ request.GET.q }}" placeholder="Nome ou banco...">
+                    <input type="text" class="form-control" name="bank" 
+                           value="{{ request.GET.bank }}" placeholder="Nome ou banco...">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Tipo</label>
                     <select class="form-select" name="type">
                         <option value="">Todos</option>
-                        <option value="checking" {% if request.GET.type == 'checking' %}selected{% endif %}>Conta Corrente</option>
-                        <option value="savings" {% if request.GET.type == 'savings' %}selected{% endif %}>Poupança</option>
-                        <option value="credit" {% if request.GET.type == 'credit' %}selected{% endif %}>Cartão de Crédito</option>
-                        <option value="investment" {% if request.GET.type == 'investment' %}selected{% endif %}>Investimento</option>
+                        <option value="corrente" {% if request.GET.type == 'corrente' %}selected{% endif %}>Conta Corrente</option>
+                        <option value="poupanca" {% if request.GET.type == 'poupanca' %}selected{% endif %}>Poupança</option>
+                        <option value="cartao" {% if request.GET.type == 'cartao' %}selected{% endif %}>Cartão de Crédito</option>
+                        <option value="investimento" {% if request.GET.type == 'investimento' %}selected{% endif %}>Investimento</option>
+                        <option value="carteira" {% if request.GET.type == 'carteira' %}selected{% endif %}>Dinheiro Físico</option>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Status</label>
-                    <select class="form-select" name="status">
+                    <select class="form-select" name="is_active">
                         <option value="">Todos</option>
-                        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Ativas</option>
-                        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inativas</option>
+                            <option value="True" {% if request.GET.is_active == 'True' %}selected{% endif %}>Ativas</option>
+                            <option value="False" {% if request.GET.is_active == 'False' %}selected{% endif %}>Inativas</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
@@ -59,7 +59,7 @@
                 <div class="card h-100 account-card {% if not account.is_active %}opacity-50{% endif %}">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="account-icon bg-{{ account.color|default:'primary' }} text-white">
+                            <div class="account-icon bg-{{ account.account_color|default:'primary' }} text-white">
                                 <i class="bi bi-{{ account.icon|default:'bank' }}"></i>
                             </div>
                             <div class="dropdown">
@@ -68,20 +68,19 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
-                                        <a class="dropdown-item" href="{% url 'accounts:detail' account.id %}"> {{ account.bank }}
+                                        <a class="dropdown-item" href="{% url 'accounts:detail' account.id_account %}">
                                             <i class="bi bi-eye me-2"></i>Ver detalhes
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="{% url 'accounts:edit' account.id %}">
-                                            {{ account.bank }}
+                                        <a class="dropdown-item" href="{% url 'accounts:edit' account.id_account %}">
                                             <i class="bi bi-pencil me-2"></i>Editar
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item text-danger" href="#" 
-                                           data-bs-toggle="modal" data-bs-target="#deleteModal{{ account.id }}">
+                                           data-bs-toggle="modal" data-bs-target="#deleteModal{{ account.id_account }}">
                                             <i class="bi bi-trash me-2"></i>Excluir
                                         </a>
                                     </li>
@@ -93,7 +92,7 @@
                         <p class="text-muted small mb-3">{{ account.bank }}</p>
                         
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-{{ account.type_color }}">
+                            <span class="badge bg-{{ account.account_color }}">
                                 {{ account.get_type_display }}
                             </span>
                             <h4 class="mb-0 {% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %}">
@@ -114,7 +113,7 @@
                         {% endif %}
                     </div>
                     <div class="card-footer bg-transparent">
-                        <a href="{% url 'accounts:detail' account.id %}" class="btn btn-outline-primary btn-sm w-100">
+                        <a href="{% url 'accounts:detail' account.id_account %}" class="btn btn-outline-primary btn-sm w-100">
                             <i class="bi bi-arrow-right me-1"></i>Ver Transações
                             {{ account.bank }}
                         </a>
@@ -123,7 +122,7 @@
             </div>
             
             <!-- Modal de Exclusão -->
-            <div class="modal fade" id="deleteModal{{ account.id }}" tabindex="-1">
+            <div class="modal fade" id="deleteModal{{ account.id_account }}" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -139,8 +138,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <form method="post" action="{% url 'accounts:delete' account.id %}" class="d-inline">
-                                {{ account.bank }}
+                            <form method="post" action="{% url 'accounts:delete' account.id_account %}" class="d-inline">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">
                                     <i class="bi bi-trash me-1"></i>Excluir

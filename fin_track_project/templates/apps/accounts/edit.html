@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Conta - {{ account.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:list' %}">Minhas Contas</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:detail' account.id_account %}">{{ account.name }}</a></li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pencil me-2 text-primary"></i>Editar Conta
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label fw-bold">Nome da Conta *</label>
+                            <input type="text" 
+                                   class="form-control {% if form.name.errors %}is-invalid{% endif %}" 
+                                   id="id_name" name="name" 
+                                   value="{{ form.name.value|default:account.name }}" 
+                                   required>
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_bank" class="form-label fw-bold">Banco / Instituição *</label>
+                            <input type="text" 
+                                   class="form-control {% if form.bank.errors %}is-invalid{% endif %}" 
+                                   id="id_bank" name="bank" 
+                                   value="{{ form.bank.value|default:account.bank }}" 
+                                   required>
+                            {% if form.bank.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.bank.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_type" class="form-label fw-bold">Tipo *</label>
+                                <select class="form-select {% if form.type.errors %}is-invalid{% endif %}" id="id_type" name="type" required>
+                                    <option value="corrente" {% if account.type == 'corrente' %}selected{% endif %}>Conta Corrente</option>
+                                    <option value="poupanca" {% if account.type == 'poupanca' %}selected{% endif %}>Poupança</option>
+                                    <option value="cartao" {% if account.type == 'cartao' %}selected{% endif %}>Cartão de Crédito</option>
+                                    <option value="investimento" {% if account.type == 'investimento' %}selected{% endif %}>Investimento</option>
+                                    <option value="dinheiro" {% if account.type == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="id_account_color" class="form-label fw-bold">Cor</label>
+                                <select class="form-select" id="id_account_color" name="account_color">
+                                    <option value="primary" {% if account.account_color == 'primary' %}selected{% endif %}>Azul</option>
+                                    <option value="success" {% if account.account_color == 'success' %}selected{% endif %}>Verde</option>
+                                    <option value="danger" {% if account.account_color == 'danger' %}selected{% endif %}>Vermelho</option>
+                                    <option value="warning" {% if account.account_color == 'warning' %}selected{% endif %}>Amarelo</option>
+                                    <option value="info" {% if account.account_color == 'info' %}selected{% endif %}>Ciano</option>
+                                    <option value="secondary" {% if account.account_color == 'secondary' %}selected{% endif %}>Cinza</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_balance" class="form-label fw-bold">Saldo Atual *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" step="0.01" class="form-control" id="id_balance" name="balance" 
+                                       value="{{ form.balance.value|default:account.balance|stringformat:'.2f' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="credit_limit_group" {% if account.type != 'cartao' %}style="display: none;"{% endif %}>
+                            <label for="id_credit_limit" class="form-label fw-bold">Limite do Cartão</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" step="0.01" class="form-control" id="id_credit_limit" name="credit_limit" 
+                                       value="{{ form.credit_limit.value|default:account.credit_limit|stringformat:'.2f' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-4 form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="id_is_active" name="is_active" 
+                                   {% if account.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="id_is_active">Conta ativa para uso</label>
+                        </div>
+
+                        <div class="d-flex gap-2 border-top pt-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-save me-2"></i>Salvar Alterações
+                            </button>
+                            <a href="{% url 'accounts:list' %}" class="btn btn-outline-secondary px-4">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/apps/accounts/edit.js' %}"></script>
+{% endblock %}

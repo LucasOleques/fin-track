@@ -19,7 +19,7 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <div class="d-flex align-items-center mb-2">
-                        <div class="account-icon bg-{{ account.color|default:'primary' }} text-white me-3">
+                        <div class="account-icon bg-{{ account.account_color|default:'primary' }} text-white me-3">
                             <i class="bi bi-{{ account.icon|default:'bank' }}"></i>
                         </div>
                         <div>
@@ -41,10 +41,10 @@
         </div>
         <div class="card-footer bg-transparent">
             <div class="d-flex gap-2">
-                <a href="{% url 'transactions:create' %}?account={{ account.id }}" class="btn btn-primary btn-sm">
+                <a href="{% url 'transactions:create' %}?account={{ account.id_account }}" class="btn btn-primary btn-sm">
                     <i class="bi bi-plus-lg me-1"></i>Nova Transação
                 </a>
-                <a href="{% url 'accounts:edit' account.id %}" class="btn btn-outline-secondary btn-sm">
+                <a href="{% url 'accounts:edit' account.id_account %}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-pencil me-1"></i>Editar
                 </a>
             </div>
@@ -68,8 +68,8 @@
                     <label class="form-label">Tipo</label>
                     <select class="form-select" name="type">
                         <option value="">Todos</option>
-                        <option value="income" {% if request.GET.type == 'income' %}selected{% endif %}>Receitas</option>
-                        <option value="expense" {% if request.GET.type == 'expense' %}selected{% endif %}>Despesas</option>
+                        <option value="receita" {% if request.GET.type == 'receita' %}selected{% endif %}>Receitas</option>
+                        <option value="despesa" {% if request.GET.type == 'despesa' %}selected{% endif %}>Despesas</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -119,9 +119,9 @@
                                     {{ transaction.category.name|default:'Sem categoria' }}
                                 </span>
                             </td>
-                            <td class="text-end {% if transaction.type == 'income' %}text-success{% else %}text-danger{% endif %} fw-bold">
-                                {% if transaction.type == 'income' %}+{% else %}-{% endif %}
-                                R$ {{ transaction.amount|floatformat:2 }}
+                            <td class="text-end {% if transaction.transaction_type == 'receita' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                {% if transaction.transaction_type == 'receita' %}+{% else %}-{% endif %}
+                                R$ {{ transaction.value|floatformat:2 }}
                             </td>
                             <td class="text-center">
                                 <a href="{% url 'transactions:edit' transaction.id %}" class="btn btn-sm btn-outline-secondary">
@@ -166,7 +166,7 @@
             <div class="card-body text-center py-5">
                 <i class="bi bi-receipt text-muted" style="font-size: 3rem;"></i>
                 <p class="text-muted mt-2">Nenhuma transação encontrada</p>
-                <a href="{% url 'transactions:create' %}?account={{ account.id }}" class="btn btn-primary btn-sm">
+                <a href="{% url 'transactions:create' %}?account={{ account.id_account }}" class="btn btn-primary btn-sm">
                     <i class="bi bi-plus-lg me-1"></i>Nova Transação
                 </a>
             </div>

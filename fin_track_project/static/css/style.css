@@ -79,3 +79,14 @@ body {
 
 /* Hover Effects */
 .account-card:hover, .category-card:hover { transform: translateY(-2px); transition: transform 0.2s; }
+
+/* Estilo para manter o ícone consistente com o restante da sua interface */
+.account-icon {
+    background-color: var(--bs-primary); /* Fallback */
+}
+.bg-azul { background-color: #0d6efd !important; }
+.bg-verde { background-color: #198754 !important; }
+.bg-vermelho { background-color: #dc3545 !important; }
+.bg-amarelo { background-color: #ffc107 !important; color: #000 !important; }
+.bg-ciano { background-color: #0dcaf0 !important; }
+.bg-cinza { background-color: #6c757d !important; }
