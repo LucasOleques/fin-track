@@ -1,3 +1,5 @@
+from accounts.models import Account
+
 from .models import Admin, Client
 from .serializer import AdminSerializer, ClientSerializer
 
@@ -177,7 +179,10 @@ class ClientViewSet(viewsets.GenericViewSet):
     def user_profile_view(request):
         user = request.user
         avatar_base64 = None
-        
+        accounts = Account.objects.filter(user=request.user)
+        active_accounts = accounts.filter(is_active=True).count()
+
+
         if user.avatar:
             # Converte o binário para base64 para o HTML
             avatar_base64 = base64.b64encode(user.avatar).decode('utf-8')
@@ -189,6 +194,7 @@ class ClientViewSet(viewsets.GenericViewSet):
             'email': user.email,
             'first_name': user.first_name,
             'last_name': user.last_name,
+            'active_accounts': active_accounts
         }
         return render(request, 'apps/user/profile.html', context)
 
