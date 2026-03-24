@@ -5,20 +5,23 @@ Uma aplicação desenvolvida com Django e Django REST Framework (DRF) para o ger
 ## Funcionalidades de Negócio Implementadas
 * **Gestão de Usuários:** Autenticação segura baseada em token e endpoints para CRUD de usuários.
 * **Controle de Transações Financeiras:** API para registro de receitas e despesas.
-* **Organização Financeira:** Suporte para categorização de transações e gerenciamento de múltiplas contas.
+* **Organização Financeira:** Suporte para categorização de transações e gerenciamento de múltiplas contas com tipos (corrente, poupança, investimento, etc.) e cores personalizáveis.
 * **Segurança e Isolamento de Dados:** Cada usuário só pode acessar e gerenciar seus próprios dados.
+* **Trilha de Auditoria (Audit Log):** Sistema interno de logs (`audit_logger.py`) para registro detalhado e automatizado de ações e alterações importantes realizadas pelos usuários.
+* **Interface Web Responsiva:** Front-end com painéis dinâmicos, visualização detalhada de contas (com ícones e cores personalizáveis), listagem e filtragem avançada de transações (por período, tipo, categoria) com ações de edição e exclusão, e área de gestão de perfil com suporte a alteração de credenciais e upload de foto (avatar).
 
 ## Tecnologias Utilizadas
 - **Python:** A linguagem de programação principal do projeto.
 - **Django:** O framework web principal da aplicação, gerenciando a lógica de negócio, modelos e rotas.
 - **Django REST Framework (DRF):** Toolkit essencial para a construção rápida e flexível de APIs RESTful, cuidando da serialização, autenticação e viewsets.
-- **Bootstrap 5:** Framework CSS para a construção da interface web responsiva.
+- **Bootstrap 5 & Bootstrap Icons:** Framework CSS e biblioteca de ícones para a construção da interface web responsiva.
 - **SQLite:** Banco de dados relacional padrão para o ambiente de desenvolvimento.
 - **PostgreSQL:** Sistema de gerenciamento de banco de dados relacional (produção).
 - **JWT:** Para implementar autenticação segura baseada em tokens.
 - **django-filter:** Para permitir filtragem avançada e declarativa nos endpoints da API, facilitando a consulta de dados.
 - **python-decouple:** Para gerenciar variáveis de ambiente de forma segura, separando as configurações (como chaves de API e credenciais de banco de dados) do código-fonte.
-
+- **Módulo `logging` do Python:** Utilizado para a implementação da trilha de auditoria (`audit_trail.log`).
+- **Google Fonts:** Para a fonte `Inter` utilizada na interface.
 
 
 ## Pré-requisitos
@@ -36,6 +39,7 @@ fin-track/
 │   ├── __init__.py
 │   ├── settings.py           # Configurações globais do Django
 │   ├── urls.py               # Rotas URL globais da API
+│   ├── logs/                 # Arquivos de log e sistema de trilha de auditoria
 │   ├── asgi.py               # Configuração ASGI para deploy (em andamento)
 │   ├── wsgi.py               # Configuração WSGI para deploy (em andamento)
 │   ├── static/               # Arquivos estáticos (CSS, JS)
@@ -45,6 +49,7 @@ fin-track/
 │       ├── accounts/            # Módulo de gestão de contas bancárias
 │       ├── transactions/        # Módulo de gestão de transações financeiras
 │       └── categories/          # Módulo de gestão de categorias de transações
+├── scripts/                  # Scripts utilitários de automação e setup (ex: PowerShell)
 ├── manage.py                 # Utilitário de linha de comando do Django
 ├── requirements.txt          # Dependências do projeto
 └── README.md                 # Documentação principal do projeto
@@ -140,22 +145,47 @@ Configuração para iniciar o projeto localmente.
 6.  **Acesse a API:**
     Acesse http://localhost:8000/api/ para interagir com a API.
 
-## Script de Limpeza do Projeto
+## Script de Automação (Setup e Limpeza)
 
-O projeto inclui um script PowerShell para limpeza de arquivos e pastas temporárias, caches e arquivos desnecessários gerados durante o desenvolvimento.
+O projeto inclui um script PowerShell (`fin_track_clean.ps1`) para automatizar tarefas de limpeza e configuração do ambiente de desenvolvimento.
 
-**Script:** `fin_track_clean.ps1`
+**Localização:** `scripts/fin_track_clean.ps1`
 
-**Para que serve?**
+**Funcionalidades:**
 
-Remove arquivos `__pycache__`, arquivos `.pyc`, pastas de migrações não essenciais e outros resíduos comuns em projetos Python/Django, facilitando a manutenção e evitando sujeira no versionamento.
+O script é capaz de realizar um setup completo do ambiente, incluindo:
+- Limpeza de cache (`__pycache__`) e migrações antigas.
+- Exclusão do banco de dados SQLite para um reinício limpo.
+- Ativação do ambiente virtual (Conda ou venv).
+- Carregamento de variáveis de ambiente a partir do arquivo `.env`.
+- Execução dos comandos `makemigrations`, `migrate` e `createsuperuser`.
 
-**Como executar:**
+**Como Executar:**
 
-No terminal do Windows, na raiz do projeto:
+No terminal do Windows, na raiz do projeto, execute o script passando os parâmetros desejados. Por padrão, o script limpa o cache e as migrações, e em seguida executa o setup do Django.
+
+**Parâmetros Disponíveis:**
+
+| Parâmetro | Descrição |
+| --- | --- |
+| `-DeleteDB` | Remove o arquivo do banco de dados SQLite (`db.sqlite3`) antes de executar as migrações. |
+| `-SkipCache` | Pula a etapa de limpeza dos diretórios de cache (`__pycache__`). |
+| `-SkipMigrations` | Pula a etapa de limpeza dos arquivos de migração antigos (exceto `__init__.py`). |
+| `-SkipEnv` | Pula o carregamento das variáveis de ambiente a partir do arquivo `.env`. |
+| `-DryRun` | Simula a execução, exibindo as ações que seriam realizadas sem executá-las de fato. É útil para verificar o que o script fará. |
+| `-Help` | Exibe uma mensagem de ajuda detalhando todos os parâmetros disponíveis e sai. |
+
+**Exemplos de Uso:**
 
 ```powershell
-./fin_track_clean.ps1
+# Executa uma limpeza completa (incluindo o banco de dados) e recria o ambiente
+.\scripts\fin_track_clean.ps1 -DeleteDB
+
+# Executa o script pulando a limpeza de cache e migrações
+.\scripts\fin_track_clean.ps1 -SkipCache -SkipMigrations
+
+# Apenas simula a execução para ver o que seria feito, sem alterar nada
+.\scripts\fin_track_clean.ps1 -DeleteDB -DryRun
 ```
 
 Se necessário, permita a execução de scripts PowerShell com:
