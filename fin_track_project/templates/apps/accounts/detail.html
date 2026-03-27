@@ -116,7 +116,7 @@
                             <td>{{ transaction.date|date:"d/m/Y" }}</td>
                             <td>{{ transaction.description }}</td>
                             <td>
-                                <span class="badge bg-{{ transaction.category.color|default:'secondary' }}">
+                                <span class="badge bg-{{ transaction.category.category_color|default:'secondary' }}">
                                     {{ transaction.category.name|default:'Sem categoria' }}
                                 </span>
                             </td>

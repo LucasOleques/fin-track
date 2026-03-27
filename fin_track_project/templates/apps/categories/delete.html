@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Categoria - {{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'categories:list' %}">Minhas Categorias</a></li>
+                    <li class="breadcrumb-item active">Excluir</li>
+                </ol>
+            </nav>
+
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="category-icon bg-{{ category.category_color|default:'secondary' }} text-white mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.5rem;">
+                            <i class="bi bi-tag"></i>
+                        </div>
+                        <h4 class="mb-1">{{ category.name }}</h4>
+                        <p class="text-muted">{{ category.get_type_display }}</p>
+                    </div>
+
+                    <div class="alert alert-warning border-0 bg-light">
+                        <p class="mb-0 text-center">
+                            Você tem certeza que deseja excluir esta categoria? 
+                            <br>
+                            <strong class="text-danger">Atenção: A ação não poderá ser desfeita.</strong>
+                        </p>
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-trash me-2"></i>Confirmar e Excluir
+                            </button>
+                            <a href="{% url 'categories:list' %}" class="btn btn-outline-secondary">
+                                Cancelar e Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted small">ID da Categoria: #{{ category.id_category }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -90,3 +90,33 @@ body {
 .bg-amarelo { background-color: #ffc107 !important; color: #000 !important; }
 .bg-ciano { background-color: #0dcaf0 !important; }
 .bg-cinza { background-color: #6c757d !important; }
+
+.color-option {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.color-option:hover {
+    transform: scale(1.1);
+}
+.btn-check:checked + .color-option {
+    border-color: #212529;
+    transform: scale(1.15);
+}
+.icon-option {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-check:checked + .icon-option {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}

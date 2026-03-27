@@ -45,21 +45,21 @@
                         <div class="mb-3">
                             <label class="form-label">Tipo *</label>
                             <div class="btn-group w-100" role="group">
-                                <input type="radio" class="btn-check" name="type" id="type_expense" 
-                                       value="expense" {% if form.type.value == 'expense' %}checked{% endif %}>
-                                <label class="btn btn-outline-danger" for="type_expense">
+                                <input type="radio" class="btn-check" name="type" id="type_despesa" 
+                                       value="despesa" {% if form.type.value == 'despesa' %}checked{% endif %}>
+                                <label class="btn btn-outline-danger" for="type_despesa">
                                     <i class="bi bi-arrow-down-circle me-1"></i>Despesa
                                 </label>
                                 
-                                <input type="radio" class="btn-check" name="type" id="type_income" 
-                                       value="income" {% if form.type.value == 'income' %}checked{% endif %}>
-                                <label class="btn btn-outline-success" for="type_income">
+                                <input type="radio" class="btn-check" name="type" id="type_receita" 
+                                       value="receita" {% if form.type.value == 'receita' %}checked{% endif %}>
+                                <label class="btn btn-outline-success" for="type_receita">
                                     <i class="bi bi-arrow-up-circle me-1"></i>Receita
                                 </label>
                                 
-                                <input type="radio" class="btn-check" name="type" id="type_both" 
-                                       value="both" {% if form.type.value == 'both' or not form.type.value %}checked{% endif %}>
-                                <label class="btn btn-outline-info" for="type_both">
+                                <input type="radio" class="btn-check" name="type" id="type_ambos" 
+                                       value="ambos" {% if form.type.value == 'ambos' or not form.type.value %}checked{% endif %}>
+                                <label class="btn btn-outline-info" for="type_ambos">
                                     <i class="bi bi-arrows-expand me-1"></i>Ambos
                                 </label>
                             </div>
@@ -69,32 +69,17 @@
                         <div class="mb-3">
                             <label class="form-label">Cor</label>
                             <div class="color-picker d-flex flex-wrap gap-2">
-                                {% for color in colors %}
+                                
+                                {% for color in category_color %}
                                 <div class="form-check form-check-inline m-0">
-                                    <input type="radio" class="btn-check" name="color" 
-                                           id="color_{{ color.value }}" value="{{ color.value }}"
-                                           {% if form.color.value == color.value %}checked{% endif %}>
-                                    <label class="color-option bg-{{ color.value }}" for="color_{{ color.value }}" 
-                                           title="{{ color.label }}"></label>
+                                    <input type="radio" class="btn-check" name="category_color" 
+                                        id="color_{{ color.0 }}" value="{{ color.0 }}" required>
+                                        
+                                    <label class="color-option bg-{{ color.0 }}" for="color_{{ color.0 }}" 
+                                        title="{{ color.1 }}"></label>
                                 </div>
                                 {% endfor %}
-                            </div>
-                        </div>
-                        
-                        <!-- Ícone -->
-                        <div class="mb-3">
-                            <label class="form-label">Ícone</label>
-                            <div class="icon-picker d-flex flex-wrap gap-2">
-                                {% for icon in icons %}
-                                <div class="form-check form-check-inline m-0">
-                                    <input type="radio" class="btn-check" name="icon" 
-                                           id="icon_{{ icon.value }}" value="{{ icon.value }}"
-                                           {% if form.icon.value == icon.value %}checked{% endif %}>
-                                    <label class="icon-option btn btn-outline-secondary" for="icon_{{ icon.value }}">
-                                        <i class="bi bi-{{ icon.value }}"></i>
-                                    </label>
-                                </div>
-                                {% endfor %}
+                                
                             </div>
                         </div>
                         
@@ -121,39 +106,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .color-option {
-        display: block;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        cursor: pointer;
-        border: 2px solid transparent;
-        transition: transform 0.2s, border-color 0.2s;
-    }
-    .color-option:hover {
-        transform: scale(1.1);
-    }
-    .btn-check:checked + .color-option {
-        border-color: #212529;
-        transform: scale(1.15);
-    }
-    
-    .icon-option {
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .btn-check:checked + .icon-option {
-        background-color: var(--bs-primary);
-        border-color: var(--bs-primary);
-        color: white;
-    }
-</style>
 {% endblock %}

@@ -3,15 +3,15 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start">
                 <div class="d-flex align-items-center">
-                    <div class="category-icon bg-{{ category.color|default:'secondary' }} text-white me-3">
-                        <i class="bi bi-{{ category.icon|default:'tag' }}"></i>
+                    <div class="category-icon bg-{{ category.category_color|default:'primary' }} text-white me-3">
+                        <i class="bi bi-tag"></i>
                     </div>
                     <div>
                         <h5 class="card-title mb-1">{{ category.name }}</h5>
-                        <span class="badge bg-{% if category.type == 'income' %}success{% elif category.type == 'expense' %}danger{% else %}info{% endif %}">
-                            {% if category.type == 'income' %}Receita
-                            {% elif category.type == 'expense' %}Despesa
-                            {% else %}Ambos{% endif %}
+                        <span class="badge bg-{% if category.type == 'despesa' %}danger{% elif category.type == 'receita' %}success{% else %}info{% endif %}">
+                            {% if category.type == 'despesa' %}Despesa
+                            {% elif category.type == 'receita' %}Receita
+                            {% elif category.type == 'ambos' %}Ambos{% endif %}
                         </span>
                     </div>
                 </div>
@@ -21,36 +21,23 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="{% url 'categories:edit' category.id %}">
+                            <a class="dropdown-item" href="{% url 'categories:edit' category.id_category %}">
                                 <i class="bi bi-pencil me-2"></i>Editar
                             </a>
                         </li>
-                        {% if not category.is_system %}
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <a class="dropdown-item text-danger" href="#" 
-                               data-bs-toggle="modal" data-bs-target="#deleteModal{{ category.id }}">
+                               data-bs-toggle="modal" data-bs-target="#deleteModal{{ category.id_category }}">
                                 <i class="bi bi-trash me-2"></i>Excluir
                             </a>
                         </li>
-                        {% endif %}
                     </ul>
                 </div>
             </div>
             
             {% if category.description %}
                 <p class="text-muted small mt-2 mb-0">{{ category.description }}</p>
-            {% endif %}
-        </div>
-        <div class="card-footer bg-transparent">
-            <small class="text-muted">
-                <i class="bi bi-receipt me-1"></i>
-                {{ category.transaction_count }} transaç{% if category.transaction_count == 1 %}ão{% else %}ões{% endif %}
-            </small>
-            {% if category.is_system %}
-                <span class="badge bg-light text-muted float-end">
-                    <i class="bi bi-lock me-1"></i>Sistema
-                </span>
             {% endif %}
         </div>
     </div>

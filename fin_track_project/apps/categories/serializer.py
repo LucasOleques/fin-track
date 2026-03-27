@@ -7,6 +7,10 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = [
             'user',
             'name',
+            'type',
+            'category_color',
+            'description',
+            'created_at',
         ]
         read_only_fields = ['user']
 
@@ -15,3 +19,7 @@ class CategorySerializer(serializers.ModelSerializer):
         if value.user != user:
             raise serializers.ValidationError("Esta conta não pertence a você.")
         return value
+    
+    def create(self, validated_data):
+        category = Category.objects.create(**validated_data)
+        return category

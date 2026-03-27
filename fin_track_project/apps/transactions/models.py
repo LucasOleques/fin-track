@@ -9,6 +9,7 @@ class Transaction(models.Model):
         ('despesa', 'Despesa'),
     ]
 
+    id_transaction = models.AutoField(primary_key=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions', help_text='Conta associada à transação')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, help_text='Categoria da transação')
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES, help_text='Tipo de transação: receita ou despesa')
