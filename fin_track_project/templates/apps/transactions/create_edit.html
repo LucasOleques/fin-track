@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if form.instance.pk %}Editar{% else %}Nova{% endif %} Transação - FinTrack{% endblock %}
+{% block title %}{% if transaction %}Editar{% else %}Nova{% endif %} Transação - FinTrack{% endblock %}
 
 {% block content %}
 {% load l10n %}
@@ -11,8 +11,8 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="bi bi-{% if form.instance.pk %}pencil{% else %}plus-lg{% endif %} me-2"></i>
-                        {% if form.instance.pk %}Editar Transação{% else %}Nova Transação{% endif %}
+                        <i class="bi bi-{% if transaction %}pencil{% else %}plus-lg{% endif %} me-2"></i>
+                        {% if transaction %}Editar Transação{% else %}Nova Transação{% endif %}
                     </h5>
                 </div>
                 <div class="card-body">
@@ -29,38 +29,45 @@
                         <div class="mb-4">
                             <label class="form-label">Tipo *</label>
                             <div class="btn-group w-100" role="group">
-                                <input type="radio" class="btn-check" name="type" id="type_expense" 
-                                       value="expense" {% if form.type.value != 'income' %}checked{% endif %}>
-                                <label class="btn btn-outline-danger" for="type_expense">
+                                <input type="radio" class="btn-check" name="transaction_type" id="id_transaction_type_despesa" 
+                                       value="despesa" {% if form.instance.transaction_type == 'despesa' or not form.instance.pk %}checked{% endif %} required>
+                                <label class="btn btn-outline-danger" for="id_transaction_type_despesa">
                                     <i class="bi bi-arrow-down-circle me-1"></i>Despesa
                                 </label>
                                 
-                                <input type="radio" class="btn-check" name="type" id="type_income" 
-                                       value="income" {% if form.type.value == 'income' %}checked{% endif %}>
-                                <label class="btn btn-outline-success" for="type_income">
+                                <input type="radio" class="btn-check" name="transaction_type" id="id_transaction_type_receita" 
+                                       value="receita" {% if form.instance.transaction_type == 'receita' %}checked{% endif %} required>
+                                <label class="btn btn-outline-success" for="id_transaction_type_receita">
                                     <i class="bi bi-arrow-up-circle me-1"></i>Receita
                                 </label>
+
+                                <input type="radio" class="btn-check" name="transaction_type" id="id_transaction_type_transferencia" 
+                                       value="transferencia" {% if form.instance.transaction_type == 'transferencia' %}checked{% endif %} required>
+                                <label class="btn btn-outline-info" for="id_transaction_type_transferencia">
+                                    <i class="bi bi-arrow-left-right me-1"></i>Transferência
+                                </label>
+
                             </div>
                         </div>
                         
                         <!-- Valor -->
                         <div class="mb-3">
-                            <label for="id_amount" class="form-label">Valor *</label>
+                            <label for="id_value" class="form-label">Valor *</label>
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text">R$</span>
                                 <input type="number" 
-                                       class="form-control {% if form.amount.errors %}is-invalid{% endif %}" 
-                                       id="id_amount" 
-                                       name="amount" 
-                                       value="{{ form.amount.value|default:'' }}"
+                                       class="form-control {% if form.value.errors %}is-invalid{% endif %}" 
+                                       id="id_value" 
+                                       name="value" 
+                                       value="{{ form.value.value|default:'' }}"
                                        step="0.01"
                                        min="0.01"
                                        placeholder="0,00"
                                        required>
                             </div>
-                            {% if form.amount.errors %}
+                            {% if form.value.errors %}
                                 <div class="invalid-feedback d-block">
-                                    {% for error in form.amount.errors %}{{ error }}{% endfor %}
+                                    {% for error in form.value.errors %}{{ error }}{% endfor %}
                                 </div>
                             {% endif %}
                         </div>
@@ -73,7 +80,7 @@
                                    id="id_description" 
                                    name="description" 
                                    value="{{ form.description.value|default:'' }}"
-                                   placeholder="Ex: Supermercado, Salário, Aluguel"
+                                   placeholder="Ex: Supermercado, Salário, Aluguel..."
                                    required>
                             {% if form.description.errors %}
                                 <div class="invalid-feedback">
@@ -90,7 +97,7 @@
                                        class="form-control {% if form.date.errors %}is-invalid{% endif %}" 
                                        id="id_date" 
                                        name="date" 
-                                       value="{{ form.date.value|date:'Y-m-d'|default:today }}"
+                                       value="{{ form.date.value|date:'Y-m-d'|default:'' }}"
                                        required>
                                 {% if form.date.errors %}
                                     <div class="invalid-feedback">
@@ -106,9 +113,9 @@
                                         id="id_account" name="account" required>
                                     <option value="">Selecione...</option>
                                     {% for account in accounts %}
-                                        <option value="{{ account.id }}" 
-                                                {% if form.account.value == account.id or request.GET.account == account.id|stringformat:'d' %}selected{% endif %}>
-                                            {{ account.name }} ({{ account.bank }})
+                                        <option value="{{ account.id_account }}" 
+                                                {% if form.account.value == account.id_account or request.GET.account == account.id_account %}selected{% endif %}>
+                                            {{ account.name }} ({{ account.get_type_display }})
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -126,10 +133,10 @@
                             <select class="form-select" id="id_category" name="category">
                                 <option value="">Sem categoria</option>
                                 {% for category in categories %}
-                                    <option value="{{ category.id }}" 
+                                    <option value="{{ category.id_category }}" 
                                             data-type="{{ category.type }}"
-                                            {% if form.category.value == category.id %}selected{% endif %}>
-                                        {{ category.name }}
+                                            {% if form.category.value == category.id_category or request.GET.category == category.id_category%}selected{% endif %}>
+                                        {{ category.name }} ({{ category.get_type_display }})
                                     </option>
                                 {% endfor %}
                             </select>
@@ -165,7 +172,7 @@
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg me-1"></i>
-                                {% if form.instance.pk %}Salvar Alterações{% else %}Registrar{% endif %}
+                                {% if form.instance.pk %}Salvar{% else %}Registrar{% endif %}
                             </button>
                             <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">
                                 Cancelar
@@ -179,33 +186,7 @@
 </div>
 {% endblock %}
 
+
 {% block extra_js %}
-<script>
-    // Filtrar categorias por tipo de transação
-    const typeInputs = document.querySelectorAll('input[name="type"]');
-    const categorySelect = document.getElementById('id_category');
-    const categoryOptions = categorySelect.querySelectorAll('option[data-type]');
-    
-    function filterCategories() {
-        const selectedType = document.querySelector('input[name="type"]:checked').value;
-        
-        categoryOptions.forEach(option => {
-            const optionType = option.getAttribute('data-type');
-            if (optionType === selectedType || optionType === 'both') {
-                option.style.display = '';
-            } else {
-                option.style.display = 'none';
-                if (option.selected) {
-                    categorySelect.value = '';
-                }
-            }
-        });
-    }
-    
-    typeInputs.forEach(input => {
-        input.addEventListener('change', filterCategories);
-    });
-    
-    filterCategories(); // Executar ao carregar
-</script>
+    <script src="{% static 'js/apps/transactions/create_edit.js' %}"></script>
 {% endblock %}

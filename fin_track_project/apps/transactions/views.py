@@ -7,8 +7,14 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+from accounts.models import Account
+from categories.models import Category
+
+from django.db.models import Sum
 
 class TransactionViewSet(viewsets.ModelViewSet):
     serializer_class = TransactionSerializer
@@ -27,23 +33,150 @@ class TransactionViewSet(viewsets.ModelViewSet):
     @login_required
     def transactions_form_view(request):
         form_transactions = Transaction.objects.filter(account__user=request.user)
-        return render(request, 'apps/transactions/form.html', {'form_transactions': form_transactions})
+        return render(request, 'apps/transactions/create_edit.html', {'form_transactions': form_transactions})
 
     @login_required
     def transactions_list_view(request):
         if request.method == 'GET':
-            list_transactions = Transaction.objects.filter(account__user=request.user)
-        return render(request, 'apps/transactions/list.html', {'list_transactions': list_transactions})
+            transactions = Transaction.objects.filter(account__user=request.user)
+            accounts = Account.objects.filter(user=request.user, is_active=True)
+            categories = Category.objects.filter(user=request.user)
+            
+            total_receita = transactions.filter(transaction_type='receita').aggregate(total=Sum('value'))['total'] or 0
+            total_despesa = transactions.filter(transaction_type='despesa').aggregate(total=Sum('value'))['total'] or 0
+            total_balanco = transactions.aggregate(total=Sum('value'))['total'] or 0
+            saldo = total_receita - total_despesa
+
+        return render(request, 'apps/transactions/list.html', {
+                        'transactions': transactions,
+                        'total_receita': total_receita,
+                        'total_despesa': total_despesa,
+                        'total_balanco': total_balanco,
+                        'saldo': saldo,
+                        'accounts': accounts,
+                        'categories': categories
+                        })
 
     @login_required
     def transactions_create(request):
         if request.method == 'POST':
-            TransactionViewSet.create(request)
-        return render(request, 'apps/transactions/create.html', {'create_transactions': None})
 
+            account = request.POST.get('account')
+            category  = request.POST.get('category')
+            transaction_type = request.POST.get('transaction_type')
+            value = request.POST.get('value')
+            description = request.POST.get('description')
+            date = request.POST.get('date')
+            payment_method = request.POST.get('payment_method')
+            notes = request.POST.get('notes')
+            created_at = request.POST.get('created_at')
+
+            serializer = TransactionSerializer(
+                data={
+                    'account': account,
+                    'category': category,
+                    'transaction_type': transaction_type,
+                    'value': value,
+                    'description': description,
+                    'date': date,
+                    'payment_method': payment_method,
+                    'notes': notes,
+                    'created_at': created_at
+                },
+                context={'request': request}
+            )
+
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+                messages.success(request, "Transação criada com sucesso.")
+                return redirect ('transactions:list')
+            else:
+                for field_errors in serializer.errors.values():
+                    for error in field_errors:
+                        messages.error(request, error)
+        
+        accounts = Account.objects.filter(user=request.user, is_active=True)
+        categories = Category.objects.filter(user=request.user)
+        
+        return render(request, 'apps/transactions/create_edit.html', {
+            'accounts': accounts,
+            'categories': categories
+        })
+    
     @login_required
-    def transactions_edit_view(request, transaction_id):
-        transaction_edit = Transaction.objects.get(id=transaction_id, account__user=request.user)
+    def transactions_edit_view(request, pk):
+        transaction = Transaction.objects.filter(user=request.user,id_transaction=pk, account__user=request.user).first()
+
+        if not transaction:
+            messages.error(request, "Transação não encontrada.")
+            return redirect('transactions:list')
+        
         if request.method == 'POST':
-            TransactionViewSet.update(request, pk=transaction_id)
-        return render(request, 'apps/transactions/edit.html', {'transaction_edit': transaction_edit})
+
+            transaction.description = request.POST.get('description')
+            transaction.value = request.POST.get('value')
+            transaction.save()
+
+            account = request.POST.get('account')
+            category  = request.POST.get('category')
+            transaction_type = request.POST.get('transaction_type')
+            value = request.POST.get('value')
+            description = request.POST.get('description')
+            date = request.POST.get('date')
+            payment_method = request.POST.get('payment_method')
+            notes = request.POST.get('notes')
+            created_at = request.POST.get('created_at')
+
+            serializer = TransactionSerializer(
+                instance=transaction,
+                data={
+                    'account': account,
+                    'category': category,
+                    'transaction_type': transaction_type,
+                    'value': value,
+                    'description': description,
+                    'date': date,
+                    'payment_method': payment_method,
+                    'notes': notes,
+                    'created_at': created_at
+                },
+                partial=True,
+                context={'request': request}
+            )
+
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+                messages.success(request, "Transação criada com sucesso.")
+                return redirect ('transactions:list')
+            else:
+                for field_errors in serializer.errors.values():
+                    for error in field_errors:
+                        messages.error(request, error)
+        
+        accounts = Account.objects.filter(user=request.user, is_active=True)
+        categories = Category.objects.filter(user=request.user)
+        
+        return render(request, 'apps/transactions/create_edit.html', {
+            'transaction': transaction,
+            'accounts': accounts,
+            'categories': categories
+        })
+    
+    @login_required
+    def transactions_delete_view(request, pk):
+        transaction = Transaction.objects.filter(user=request.user,id_transaction=pk, account__user=request.user).first()
+
+        if not transaction:
+            messages.error(request, "Transação não encontrada.")
+            return redirect('transactions:list')
+
+        if request.method == 'POST':
+            try:
+                transaction.delete()
+                messages.success(request, "Transação excluída com sucesso!")
+            except Exception as e:
+                messages.error(request, f"Erro ao excluir a transação: {str(e)}")
+            
+            return redirect('transactions:list')
+
+        return render(request, 'apps/transactions/list.html', {'transaction': transaction})

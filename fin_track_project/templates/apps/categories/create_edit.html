@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if form.instance.pk %}Editar{% else %}Nova{% endif %} Categoria - FinTrack{% endblock %}
+{% block title %}{% if category %}Editar{% else %}Nova{% endif %} Categoria - FinTrack{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -10,8 +10,8 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="bi bi-{% if form.instance.pk %}pencil{% else %}plus-lg{% endif %} me-2"></i>
-                        {% if form.instance.pk %}Editar Categoria{% else %}Nova Categoria{% endif %}
+                        <i class="bi bi-{% if category %}pencil{% else %}plus-lg{% endif %} me-2"></i>
+                        {% if category %}Editar Categoria{% else %}Nova Categoria{% endif %}
                     </h5>
                 </div>
                 <div class="card-body">
@@ -31,7 +31,7 @@
                                    class="form-control {% if form.name.errors %}is-invalid{% endif %}" 
                                    id="id_name" 
                                    name="name" 
-                                   value="{{ form.name.value|default:'' }}"
+                                   value="{{ category.name|default:'' }}"
                                    placeholder="Ex: Alimentação, Transporte, Salário"
                                    required>
                             {% if form.name.errors %}
@@ -46,19 +46,19 @@
                             <label class="form-label">Tipo *</label>
                             <div class="btn-group w-100" role="group">
                                 <input type="radio" class="btn-check" name="type" id="type_despesa" 
-                                       value="despesa" {% if form.type.value == 'despesa' %}checked{% endif %}>
+                                       value="despesa" {% if category.type == 'despesa' %}checked{% endif %}>
                                 <label class="btn btn-outline-danger" for="type_despesa">
                                     <i class="bi bi-arrow-down-circle me-1"></i>Despesa
                                 </label>
                                 
                                 <input type="radio" class="btn-check" name="type" id="type_receita" 
-                                       value="receita" {% if form.type.value == 'receita' %}checked{% endif %}>
+                                       value="receita" {% if category.type == 'receita' %}checked{% endif %}>
                                 <label class="btn btn-outline-success" for="type_receita">
                                     <i class="bi bi-arrow-up-circle me-1"></i>Receita
                                 </label>
                                 
                                 <input type="radio" class="btn-check" name="type" id="type_ambos" 
-                                       value="ambos" {% if form.type.value == 'ambos' or not form.type.value %}checked{% endif %}>
+                                       value="ambos" {% if category.type == 'ambos' or not category.type %}checked{% endif %}>
                                 <label class="btn btn-outline-info" for="type_ambos">
                                     <i class="bi bi-arrows-expand me-1"></i>Ambos
                                 </label>
@@ -67,16 +67,17 @@
                         
                         <!-- Cor -->
                         <div class="mb-3">
-                            <label class="form-label">Cor</label>
+                            <label class="form-label">Cor *</label>
                             <div class="color-picker d-flex flex-wrap gap-2">
                                 
                                 {% for color in category_color %}
                                 <div class="form-check form-check-inline m-0">
                                     <input type="radio" class="btn-check" name="category_color" 
-                                        id="color_{{ color.0 }}" value="{{ color.0 }}" required>
-                                        
+                                           id="color_{{ color.0 }}" value="{{ color.0 }}"
+                                           {% if category.category_color == color.0 %}checked{% endif %} required>
+                                           
                                     <label class="color-option bg-{{ color.0 }}" for="color_{{ color.0 }}" 
-                                        title="{{ color.1 }}"></label>
+                                           title="{{ color.1 }}"></label>
                                 </div>
                                 {% endfor %}
                                 
@@ -87,14 +88,14 @@
                         <div class="mb-4">
                             <label for="id_description" class="form-label">Descrição</label>
                             <textarea class="form-control" id="id_description" name="description" rows="2"
-                                      placeholder="Descrição opcional">{{ form.description.value|default:'' }}</textarea>
+                                      placeholder="Descrição opcional">{{ category.description|default:'' }}</textarea>
                         </div>
                         
                         <!-- Botões -->
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg me-1"></i>
-                                {% if form.instance.pk %}Salvar{% else %}Criar{% endif %}
+                                {% if category %}Salvar{% else %}Criar{% endif %}
                             </button>
                             <a href="{% url 'categories:list' %}" class="btn btn-outline-secondary">
                                 Cancelar

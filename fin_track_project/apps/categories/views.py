@@ -52,11 +52,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
         context = {
             'category_color': Category.CATEGORY_COLOR
         }
-        return render(request, 'apps/categories/create.html', context)
+        return render(request, 'apps/categories/create_edit.html', context)
     
     @login_required
     def categories_edit_view(request, pk):
-        # 1. Busca a categoria específica pelo ID (pk)
         category = Category.objects.filter(user=request.user, id_category=pk).first()
         
         if not category:
@@ -64,13 +63,11 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return redirect('categories:list')
 
         if request.method == 'POST':
-            # 2. Pega os novos dados do formulário
             name = request.POST.get('name')
             type = request.POST.get('type')
             category_color = request.POST.get('category_color')
             description = request.POST.get('description')
 
-            # 3. Atualiza os dados usando o serializer
             serializer = CategorySerializer(category, data={
                 'name': name,
                 'type': type,
@@ -87,17 +84,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
                     for error in field_errors:
                         messages.error(request, error)
 
-        # 4. Envia a categoria e a lista de cores para o template
         context = {
             'category': category,
             'category_color': Category.CATEGORY_COLOR
         }
-        return render(request, 'apps/categories/edit.html', context)
+        return render(request, 'apps/categories/create_edit.html', context)
 
 
     @login_required
     def categories_delete_view(request, pk):
-        # Aqui consertamos de 'categories' para 'category' no singular
         category = Category.objects.filter(user=request.user, id_category=pk).first()
 
         if not category:
@@ -113,5 +108,4 @@ class CategoryViewSet(viewsets.ModelViewSet):
             
             return redirect('categories:list')
 
-        # Corrigido aqui também para enviar 'category'
         return render(request, 'apps/categories/delete.html', {'category': category})
