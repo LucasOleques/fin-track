@@ -14,9 +14,9 @@ if not exist "manage.py" (
     exit /b 1
 )
 
-REM Instalar waitress (se necessario)
-echo Verificando dependências...
-pip install waitress > nul 2>&1
+REM Instalar waitress e whitenoise (se necessario)
+echo Verificando dependencias...
+pip install waitress whitenoise > nul 2>&1
 
 REM Executar migracoes
 echo.
@@ -30,7 +30,7 @@ python manage.py collectstatic --noinput
 
 REM Iniciar servidor
 echo.
-echo ✅ Iniciando servidor Waitress...
+echo Iniciando servidor Waitress...
 echo.
 echo Acesse: http://localhost:8000
 echo.
