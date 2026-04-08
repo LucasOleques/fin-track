@@ -16,7 +16,7 @@
 
 O **FinTrack** é uma aplicacao web para controle financeiro pessoal. O usuario consegue cadastrar contas, organizar categorias, registrar receitas e despesas, acompanhar saldo e visualizar um dashboard com resumo das movimentacoes.
 
-Mais do que um CRUD simples, o projeto foi estruturado para mostrar capacidade de construir uma solucao completa com:
+A intenção do projeto, não é um CRUD simples. O projeto foi pensado e estruturado para mostrar capacidade de construir uma solucao completa com:
 
 - arquitetura modular por apps Django
 - autenticacao com sessao e JWT
