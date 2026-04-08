@@ -173,3 +173,8 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL_HOMO')
 
 THOUSAND_SEPARATOR='.',
 USE_THOUSAND_SEPARATOR=True
+
+# A sessão do usuário expira após 2 semanas (em segundos)
+SESSION_COOKIE_AGE = 1209600 
+# Se True, desloga o usuário imediatamente assim que ele fechar o navegador
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

@@ -59,6 +59,10 @@ class ClientViewSet(viewsets.GenericViewSet):
                     user = authenticate(request, username=user_email.username, password=password_auth)
                     if user:
                         login(request, user)
+                        request.session['user_id'] = user.id
+                        request.session['username'] = user.username
+                        request.session['email'] = user.email
+                        request.session['login_time'] = str(__import__('datetime').datetime.now())
                         # registrar_log(username_or_email, "LOGIN_SUCCESS", "Login com e-mail realizado")
                         messages.success(request, "Login realizado.")
                         return redirect('dashboard')
@@ -77,6 +81,10 @@ class ClientViewSet(viewsets.GenericViewSet):
                     user = authenticate(request, username=user_username.username, password=password_auth)
                     if user:
                         login(request, user)
+                        request.session['user_id'] = user.id
+                        request.session['username'] = user.username
+                        request.session['email'] = user.email
+                        request.session['login_time'] = str(__import__('datetime').datetime.now())
                         # registrar_log(username_or_email, "LOGIN_SUCCESS", "Login com username realizado")
                         messages.success(request, "Login realizado.")
                         return redirect('dashboard')
@@ -103,6 +111,10 @@ class ClientViewSet(viewsets.GenericViewSet):
             registrar_log(username, "Logout", "Usuário fez logout.")
         except Exception as e:
             registrar_log(username, "Logout", f"Erro ao registrar logout: {e}")
+        
+        # Se logout, limpa os cookies e a sessão
+        request.session.flush()
+        
         if logout(request):
             messages.success(request, "Logout realizado.")
         return redirect('user:login')
@@ -182,6 +194,7 @@ class ClientViewSet(viewsets.GenericViewSet):
         accounts = Account.objects.filter(user=request.user)
         active_accounts = accounts.filter(is_active=True).count()
 
+        login_time = request.session.get('login_time', 'Não disponível')
 
         if user.avatar:
             # Converte o binário para base64 para o HTML
@@ -194,7 +207,8 @@ class ClientViewSet(viewsets.GenericViewSet):
             'email': user.email,
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'active_accounts': active_accounts
+            'active_accounts': active_accounts,
+            'login_time': login_time
         }
         return render(request, 'apps/user/profile.html', context)
 
