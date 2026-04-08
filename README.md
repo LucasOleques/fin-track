@@ -1,221 +1,241 @@
-# 🪙 Fin-Track: Gestão Financeira
+# FinTrack
 
-Uma aplicação desenvolvida com Django e Django REST Framework (DRF) para o gerenciamento de finanças, integrando uma API RESTful e uma interface web responsiva. O sistema conta com o gerenciamento de usuários, contas bancárias, transações financeiras e as categorias das transações.
+### Plataforma web de gestao financeira pessoal com dashboard, autenticacao, API JWT e testes automatizados
 
-## Funcionalidades de Negócio Implementadas
-* **Gestão de Usuários:** Autenticação segura baseada em token e endpoints para CRUD de usuários.
-* **Controle de Transações Financeiras:** API para registro de receitas e despesas.
-* **Organização Financeira:** Suporte para categorização de transações e gerenciamento de múltiplas contas com tipos (corrente, poupança, investimento, etc.) e cores personalizáveis.
-* **Segurança e Isolamento de Dados:** Cada usuário só pode acessar e gerenciar seus próprios dados.
-* **Trilha de Auditoria (Audit Log):** Sistema interno de logs (`audit_logger.py`) para registro detalhado e automatizado de ações e alterações importantes realizadas pelos usuários.
-* **Interface Web Responsiva:** Front-end com painéis dinâmicos, visualização detalhada de contas (com ícones e cores personalizáveis), listagem e filtragem avançada de transações (por período, tipo, categoria) com ações de edição e exclusão, e área de gestão de perfil com suporte a alteração de credenciais e upload de foto (avatar).
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.2-green?style=for-the-badge&logo=django&logoColor=white)
+![DRF](https://img.shields.io/badge/DRF-3.16-red?style=for-the-badge&logo=django&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple?style=for-the-badge&logo=bootstrap&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT-black?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-44%20passing-success?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-brightgreen?style=for-the-badge)
 
-## Tecnologias Utilizadas
-- **Python:** A linguagem de programação principal do projeto.
-- **Django:** O framework web principal da aplicação, gerenciando a lógica de negócio, modelos e rotas.
-- **Django REST Framework (DRF):** Toolkit essencial para a construção rápida e flexível de APIs RESTful, cuidando da serialização, autenticação e viewsets.
-- **Bootstrap 5 & Bootstrap Icons:** Framework CSS e biblioteca de ícones para a construção da interface web responsiva.
-- **SQLite:** Banco de dados relacional padrão para o ambiente de desenvolvimento.
-- **PostgreSQL:** Sistema de gerenciamento de banco de dados relacional (produção).
-- **JWT:** Para implementar autenticação segura baseada em tokens.
-- **django-filter:** Para permitir filtragem avançada e declarativa nos endpoints da API, facilitando a consulta de dados.
-- **python-decouple:** Para gerenciar variáveis de ambiente de forma segura, separando as configurações (como chaves de API e credenciais de banco de dados) do código-fonte.
-- **Módulo `logging` do Python:** Utilizado para a implementação da trilha de auditoria (`audit_trail.log`).
-- **Google Fonts:** Para a fonte `Inter` utilizada na interface.
+> Projeto full-stack desenvolvido para demonstrar entrega de produto real: backend, frontend server-rendered, regras de negocio, seguranca, isolamento de dados por usuario e deploy.
 
+## Visao geral
 
-## Pré-requisitos
-- Python 3.10+
-- Conda (ou outro gerenciador de ambiente virtual como `venv`)
-- PostgreSQL 12+
+O **FinTrack** é uma aplicacao web para controle financeiro pessoal. O usuario consegue cadastrar contas, organizar categorias, registrar receitas e despesas, acompanhar saldo e visualizar um dashboard com resumo das movimentacoes.
 
-## Estrutura do Projeto
-A estrutura do projeto é organizada para facilitar a manutenção e escalabilidade, seguindo as melhores práticas do Django e DRF.
+Mais do que um CRUD simples, o projeto foi estruturado para mostrar capacidade de construir uma solucao completa com:
 
-### Diretórios e Arquivos:
-```bash
+- arquitetura modular por apps Django
+- autenticacao com sessao e JWT
+- interface responsiva com foco em usabilidade
+- regras de saldo entre contas e transacoes
+- logs de auditoria
+- testes automatizados cobrindo os fluxos principais
+
+## Destaques
+
+- **Produto de ponta a ponta:** experiencia web funcional com login, cadastro, dashboard, perfil, contas, categorias e transacoes.
+- **Backend com regra de negocio real:** controle de saldo, filtros, autenticacao, serializacao, sinais e isolamento de dados por usuario.
+- **Boa base de engenharia:** Django, DRF, `django-filter`, JWT, `Whitenoise`, `Waitress` e configuracao por variaveis de ambiente.
+- **Qualidade validada:** suite com **44 testes automatizados** cobrindo os principais fluxos da aplicacao.
+- **Visao de deploy:** projeto preparado para SQLite no desenvolvimento e PostgreSQL por configuracao de ambiente.
+
+## Principais funcionalidades
+
+- Dashboard com saldo total, receitas do mes, despesas do mes, contas ativas e ultimas transacoes.
+- Cadastro e gestao de contas financeiras com tipo, cor, limite e status ativo/inativo.
+- Cadastro de categorias para receitas, despesas ou ambos.
+- Registro de transacoes com filtros por periodo, tipo, conta e categoria.
+- Atualizacao automatica de saldo da conta em criacao e exclusao de transacoes.
+- Area de usuario com login por username ou e-mail, cadastro, perfil, avatar, troca de senha e recuperacao de senha.
+- Logs de auditoria para eventos relevantes do sistema.
+
+## Stack utilizada
+
+- **Backend:** Python, Django, Django REST Framework
+- **Autenticacao:** Session Auth + JWT (`djangorestframework-simplejwt`)
+- **Filtros:** `django-filter`
+- **Frontend:** Django Templates, Bootstrap 5, Bootstrap Icons, JavaScript
+- **Banco de dados:** SQLite no dev, PostgreSQL por configuracao
+- **Deploy / execucao web:** Waitress + Whitenoise
+- **Configuracao:** `python-decouple`
+- **Imagens:** Pillow
+
+## Estrutura do projeto
+
+```text
 fin-track/
-├── fin_track_project/
-│   ├── __init__.py
-│   ├── settings.py           # Configurações globais do Django
-│   ├── urls.py               # Rotas URL globais da API
-│   ├── logs/                 # Arquivos de log e sistema de trilha de auditoria
-│   ├── asgi.py               # Configuração ASGI para deploy (em andamento)
-│   ├── wsgi.py               # Configuração WSGI para deploy (em andamento)
-│   ├── static/               # Arquivos estáticos (CSS, JS)
-│   ├── templates/            # Templates HTML para a interface web
-│   └── apps/
-│       ├── user/                # Módulo de gestão de usuários
-│       ├── accounts/            # Módulo de gestão de contas bancárias
-│       ├── transactions/        # Módulo de gestão de transações financeiras
-│       └── categories/          # Módulo de gestão de categorias de transações
-├── scripts/                  # Scripts utilitários de automação e setup (ex: PowerShell)
-├── manage.py                 # Utilitário de linha de comando do Django
-├── requirements.txt          # Dependências do projeto
-└── README.md                 # Documentação principal do projeto
+|-- fin_track_project/
+|   |-- manage.py
+|   |-- fin_track_project/
+|   |   |-- settings.py
+|   |   |-- urls.py
+|   |   |-- views.py
+|   |   `-- tests.py
+|   |-- apps/
+|   |   |-- user/
+|   |   |-- accounts/
+|   |   |-- categories/
+|   |   `-- transactions/
+|   |-- templates/
+|   |-- static/
+|   |-- logs/
+|   `-- run_server.bat
+|-- scripts/
+|-- requirements.txt
+|-- .env.exemplo
+`-- README.md
 ```
 
-## Documentação:
-Principais endpoints da API:
+## Arquitetura por modulos
 
-### Users (Usuários)
-| Método | Endpoint | Descrição |
-| --- | --- | --- |
-| `POST` | `/api/user/` | Registra um novo usuário. |
-| `POST` | `/api/token/` | Autentica um usuário e retorna um token JWT. |
-| `GET` | `/api/user/manage/` | Retorna os dados do usuário autenticado. |
-| `PUT` | `/api/user/manage/` | Atualiza todos os dados do usuário autenticado. |
-| `PATCH` | `/api/user/manage/` | Atualiza parcialmente os dados do usuário autenticado. |
-| `DELETE` | `/api/user/manage/` | Remove o próprio usuário autenticado. |
+- `user`: autenticacao, cadastro, perfil, senha e recuperacao.
+- `accounts`: contas bancarias e de controle financeiro.
+- `categories`: classificacao das transacoes.
+- `transactions`: receitas, despesas, filtros e atualizacao de saldo.
+- `fin_track_project`: dashboard, views globais, configuracao principal e testes do nucleo.
 
-#### Exemplo de corpo para autenticação (`POST /api/token/`):
-```json
-{
-    "username": "seu_usuario",
-    "password": "sua_senha"
-}
+## Como executar localmente
+
+### 1. Clone o repositorio
+
+```bash
+git clone <repo-url>
+cd fin-track
 ```
----
 
-### Accounts (Contas)
-| Método | Endpoint | Descrição |
-| --- | --- | --- |
-| `POST` | `/api/accounts/` | Cria uma nova conta. |
-| `GET` | `/api/accounts/` | Lista todas as contas do usuário autenticado. |
-| `GET` | `/api/accounts/{id}/` | Retorna os detalhes de uma conta específica. |
-| `PUT` | `/api/accounts/{id}/` | Atualiza todos os dados de uma conta. |
-| `PATCH` | `/api/accounts/{id}/` | Atualiza parcialmente uma conta. |
-| `DELETE` | `/api/accounts/{id}/` | Remove uma conta específica. |
+### 2. Crie e ative um ambiente virtual
 
----
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
 
-### Transactions (Transações)
-| Método | Endpoint | Descrição |
-| --- | --- | --- |
-| `POST` | `/api/transactions/` | Registra uma nova transação financeira. |
-| `GET` | `/api/transactions/` | Lista todas as transações do usuário autenticado. Permite filtros. |
-| `GET` | `/api/transactions/{id}/` | Retorna os detalhes de uma transação específica. |
-| `PUT` | `/api/transactions/{id}/` | Atualiza todos os dados de uma transação. |
-| `PATCH` | `/api/transactions/{id}/` | Atualiza parcialmente uma transação. |
-| `DELETE` | `/api/transactions/{id}/` | Remove uma transação específica. |
+### 3. Instale as dependencias
 
----
+```bash
+pip install -r requirements.txt
+```
 
-### Categories (Categorias)
-| Método | Endpoint | Descrição |
-| --- | --- | --- |
-| `POST` | `/api/categories/` | Cria uma nova categoria. |
-| `GET` | `/api/categories/` | Lista todas as categorias do usuário autenticado. |
-| `GET` | `/api/categories/{id}/` | Retorna os detalhes de uma categoria específica. |
-| `PUT` | `/api/categories/{id}/` | Atualiza uma categoria. |
-| `PATCH` | `/api/categories/{id}/` | Atualiza parcialmente uma categoria. |
-| `DELETE` | `/api/categories/{id}/` | Remove uma categoria específica. |
----
+### 4. Configure o ambiente
 
-## Sobre a Autenticação:
-> Todos os endpoints protegidos exigem autenticação JWT. Os dados retornados e manipulados sempre pertencem ao usuário autenticado.
+Use o arquivo `.env.exemplo` como base e crie o seu `.env`.
 
-## Como Iniciar (Developer Onboarding)
-Configuração para iniciar o projeto localmente.
+```bash
+copy .env.exemplo .env
+```
 
-1.  **Clone do Repositório:**
-    ```bash
-    git clone <repo-url>
-    cd fin-track
-    ```
-2.  **Ambiente Virtual:**
-    ```bash
-    conda create -n fin-track
-    conda activate fin-track
-    ```
-3.  **Instalação de Dependências & Configuração do .env:**
-    ```bash
-    pip install -r requirements.txt
-    cp .env.example .env # Preencha com suas credenciais
-    ```
-4.  **Banco de Dados & Migrations:**
-    ```bash
-    python manage.py makemigrations
-    python manage.py migrate
-    ```
-5.  **Iniciar o Servidor de Desenvolvimento:**
-    ```bash
-    python manage.py runserver
-    ```
-6.  **Acesse a API:**
-    Acesse http://localhost:8000/api/ para interagir com a API.
+Campos importantes:
 
-## Script de Automação (Setup e Limpeza)
+- `SECRET_KEY`
+- `DEBUG`
+- `ALLOWED_HOSTS`
+- `CSRF_TRUSTED_ORIGINS`
+- configuracoes de banco
+- configuracoes de e-mail
 
-O projeto inclui um script PowerShell (`fin_track_clean.ps1`) para automatizar tarefas de limpeza e configuração do ambiente de desenvolvimento.
+> Importante: em `DEBUG`, use `true` ou `false`.
 
-**Localização:** `scripts/fin_track_clean.ps1`
+### 5. Rode a aplicacao
 
-**Funcionalidades:**
+```bash
+cd fin_track_project
+python manage.py migrate
+python manage.py runserver
+```
 
-O script é capaz de realizar um setup completo do ambiente, incluindo:
-- Limpeza de cache (`__pycache__`) e migrações antigas.
-- Exclusão do banco de dados SQLite para um reinício limpo.
-- Ativação do ambiente virtual (Conda ou venv).
-- Carregamento de variáveis de ambiente a partir do arquivo `.env`.
-- Execução dos comandos `makemigrations`, `migrate` e `createsuperuser`.
+Abra no navegador:
 
-**Como Executar:**
+```text
+http://127.0.0.1:8000/
+```
 
-No terminal do Windows, na raiz do projeto, execute o script passando os parâmetros desejados. Por padrão, o script limpa o cache e as migrações, e em seguida executa o setup do Django.
+## Execucao no Windows com Waitress
 
-**Parâmetros Disponíveis:**
+Para iniciar o projeto com `Waitress` e coletar estaticos automaticamente no Windows:
 
-| Parâmetro | Descrição |
-| --- | --- |
-| `-DeleteDB` | Remove o arquivo do banco de dados SQLite (`db.sqlite3`) antes de executar as migrações. |
-| `-SkipCache` | Pula a etapa de limpeza dos diretórios de cache (`__pycache__`). |
-| `-SkipMigrations` | Pula a etapa de limpeza dos arquivos de migração antigos (exceto `__init__.py`). |
-| `-SkipEnv` | Pula o carregamento das variáveis de ambiente a partir do arquivo `.env`. |
-| `-DryRun` | Simula a execução, exibindo as ações que seriam realizadas sem executá-las de fato. É útil para verificar o que o script fará. |
-| `-Help` | Exibe uma mensagem de ajuda detalhando todos os parâmetros disponíveis e sai. |
+```bat
+cd fin_track_project
+run_server.bat
+```
 
-**Exemplos de Uso:**
+## Script de automacao
+
+O projeto tambem possui um utilitario em [scripts/fin_track_clean.ps1](c:/Users/lucas/IdeaProjects%20VSCode/fin-track/scripts/fin_track_clean.ps1) para acelerar setup e limpeza do ambiente no Windows.
+
+Esse script pode:
+
+- limpar pastas `__pycache__`
+- limpar arquivos de `migrations`
+- remover o banco SQLite
+- carregar variaveis do `.env`
+- executar `makemigrations`, `migrate` e `createsuperuser`
+
+### Como executar
+
+Na raiz do projeto:
 
 ```powershell
-# Executa uma limpeza completa (incluindo o banco de dados) e recria o ambiente
-.\scripts\fin_track_clean.ps1 -DeleteDB
-
-# Executa o script pulando a limpeza de cache e migrações
-.\scripts\fin_track_clean.ps1 -SkipCache -SkipMigrations
-
-# Apenas simula a execução para ver o que seria feito, sem alterar nada
-.\scripts\fin_track_clean.ps1 -DeleteDB -DryRun
+.\scripts\fin_track_clean.ps1
 ```
 
-Se necessário, permita a execução de scripts PowerShell com:
+Se o PowerShell bloquear a execucao, rode antes:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ```
 
-# Contribuindo
+### Parametros disponiveis
 
-Pull requests são bem-vindos!  
-Siga o padrão de commits convencionais e abra uma issue antes de propor novas features.
+- `-DeleteDB`: remove o banco SQLite antes do setup.
+- `-SkipCache`: nao limpa os diretorios `__pycache__`.
+- `-SkipMigrations`: nao limpa os arquivos de migration.
+- `-SkipEnv`: nao carrega variaveis do arquivo `.env`.
+- `-DryRun`: apenas simula o que seria executado.
+- `-Help`: exibe a ajuda do script.
 
-```bash
-git checkout -b feature/nome-da-feature
-git commit -m "feat: adiciona suporte a categorias personalizadas"
-git push origin feature/nome-da-feature
+### Exemplos de uso
+
+```powershell
+.\scripts\fin_track_clean.ps1 -Help
+.\scripts\fin_track_clean.ps1 -DeleteDB
+.\scripts\fin_track_clean.ps1 -SkipCache -SkipMigrations
+.\scripts\fin_track_clean.ps1 -DeleteDB -DryRun
 ```
 
-# Licença
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+## Testes automatizados
 
----
-## Tecnologias Utilizadas
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0+-purple?style=for-the-badge&logo=bootstrap)
-![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python)
-![Django](https://img.shields.io/badge/Django-5.0+-green?style=for-the-badge&logo=django)
-![Django REST Framework](https://img.shields.io/badge/Django_Rest_Framework-3.15-red?style=for-the-badge&logo=django)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-blue?style=for-the-badge&logo=postgresql)
-![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green.svg?style=for-the-badge)
+O projeto possui cobertura dos fluxos principais da aplicacao:
+
+- dashboard e views globais
+- contas
+- categorias
+- transacoes
+- autenticacao e perfil de usuario
+
+Para rodar os testes:
+
+```bash
+cd fin_track_project
+python manage.py test
+```
+
+## Endpoints e acessos principais
+
+- `GET /` -> entrada da aplicacao
+- `GET /dashboard/` -> dashboard principal
+- `GET /user/login/` -> login
+- `GET /accounts/list/` -> contas
+- `GET /categories/list/` -> categorias
+- `GET /transactions/list/` -> transacoes
+- `POST /api/token/` -> obtencao de token JWT
+- `POST /api/token/refresh/` -> refresh de token JWT
+
+## Por que este projeto se destaca
+
+O FinTrack mostra capacidade de entregar um sistema com mentalidade de produto e nao apenas de exercicio tecnico. Ele combina interface, backend, autenticacao, organizacao modular, preocupacao com seguranca, configuracao para deploy e testes automatizados em uma unica base coesa.
+
+Em um contexto de avaliacao tecnica, este projeto evidencia:
+
+- dominio de Django e DRF
+- organizacao de codigo por contexto de negocio
+- cuidado com experiencia do usuario
+- preocupacao com manutencao e validacao automatizada
+- capacidade de evoluir um MVP para um produto mais robusto
+
+## Licenca
+
+Este projeto esta sob a licenca MIT. Consulte o arquivo [LICENSE](LICENSE).
