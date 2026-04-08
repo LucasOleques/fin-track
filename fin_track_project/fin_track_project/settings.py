@@ -20,7 +20,15 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=[], cast=list)
+# Lista de hosts permitidos
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
+
+# Configuração para CSRF e Cloudflare Tunnel
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000', cast=lambda v: [s.strip() for s in v.split(',')])
+
+# Configurar X-Forwarded-For para confiar no Cloudflare
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+TRUST_X_FORWARDED_HOST = True
 
 
 # Application definition
@@ -45,6 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files em produção
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -97,22 +106,30 @@ WSGI_APPLICATION = 'fin_track_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DB_DIR / 'db.sqlite3',
+# Usar PostgreSQL se as variáveis estiverem definidas no .env
+DB_ENGINE = config('DB_ENGINE', default='django.db.backends.sqlite3')
+DB_NAME = config('DB_NAME', default=str(DB_DIR / 'db.sqlite3'))
+
+if DB_ENGINE == 'django.db.backends.postgresql':
+    # PostgreSQL - Produção/Desenvolvimento
+    DATABASES = {
+        'default': {
+            'ENGINE': DB_ENGINE,
+            'NAME': DB_NAME,
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST'),
+            'PORT': config('DB_PORT', cast=int),
+        }
     }
-}
-# DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': config('DB_NAME'),
-#        'USER': config('DB_USER'),
-#        'PASSWORD': config('DB_PASSWORD'),
-#        'HOST': config('DB_HOST'),
-#        'PORT': config('DB_PORT'),
-#    }
-#}
+else:
+    # SQLite - Desenvolvimento padrão
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': str(DB_DIR / 'db.sqlite3'),
+        }
+    }
 
 
 # Password validation
@@ -150,7 +167,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Produção: pasta de saída
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Desenvolvimento: arquivos-fonte
+
+# WhiteNoise - Serve static files com cache e compressão
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' if not DEBUG else 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -159,16 +180,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ## Envio de e-mail homologação.
 EMAIL_HOST = config('EMAIL_HOST_HOMO')
-EMAIL_PORT = config('EMAIL_PORT_HOMO')
+EMAIL_PORT = config('EMAIL_PORT_HOMO', cast=int)
 EMAIL_BACKEND = config('EMAIL_BACKEND_HOMO')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL_HOMO')
 
-## Envio de e-mail para produção.
+## Envio de e-mail para produção (descomente para usar).
 # EMAIL_HOST = config('EMAIL_HOST')
-# EMAIL_PORT = config('EMAIL_PORT')
+# EMAIL_PORT = config('EMAIL_PORT', cast=int)
 # EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 # EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-# EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 # DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 THOUSAND_SEPARATOR='.',
@@ -178,3 +199,24 @@ USE_THOUSAND_SEPARATOR=True
 SESSION_COOKIE_AGE = 1209600 
 # Se True, desloga o usuário imediatamente assim que ele fechar o navegador
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Verificar se está em modo produção (DEBUG=False)
+if not DEBUG:
+    # HTTPS e Cookies Seguros
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # Segurança adicional
+    SECURE_HSTS_SECONDS = 31536000  # 1 ano
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Cabeçalhos de segurança
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_CONTENT_SECURITY_POLICY = {
+        "default-src": ("'self'",),
+    }
+else:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
