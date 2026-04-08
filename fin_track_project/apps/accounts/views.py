@@ -21,20 +21,22 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     @login_required
     def accounts_list_view(request):
-        accounts  = Account.objects.filter(user=request.user)
+        accounts = Account.objects.filter(user=request.user)
 
         bank = request.GET.get('bank')
-        type = request.GET.get('type')
-        is_active = request.GET.get('is_active')
-
         if bank:
-            accounts = accounts.filter(bank__icontains=bank)
-        if type:
-            accounts = accounts.filter(type=type)
+            accounts = accounts.filter(bank__icontains=bank) | accounts.filter(name__icontains=bank)
+
+        account_type = request.GET.get('type')
+        if account_type:
+            accounts = accounts.filter(type=account_type)
+
+        is_active = request.GET.get('is_active')
         if is_active:
             accounts = accounts.filter(is_active=(is_active == 'True'))
 
-        return render(request, 'apps/accounts/list.html', {'accounts' : accounts})
+        accounts = accounts.order_by('name')
+        return render(request, 'apps/accounts/list.html', {'accounts': accounts})
 
     @login_required
     def accounts_detail_view(request, pk):

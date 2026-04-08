@@ -39,14 +39,17 @@
                     <label class="form-label">Status</label>
                     <select class="form-select" name="is_active">
                         <option value="">Todos</option>
-                            <option value="True" {% if request.GET.is_active == 'True' %}selected{% endif %}>Ativas</option>
-                            <option value="False" {% if request.GET.is_active == 'False' %}selected{% endif %}>Inativas</option>
+                        <option value="True" {% if request.GET.is_active == 'True' %}selected{% endif %}>Ativas</option>
+                        <option value="False" {% if request.GET.is_active == 'False' %}selected{% endif %}>Inativas</option>
                     </select>
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-outline-primary w-100">
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-outline-primary flex-grow-1">
                         <i class="bi bi-search me-1"></i>Filtrar
                     </button>
+                    <a href="{% url 'accounts:list' %}" class="btn btn-outline-secondary flex-grow-1">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
                 </div>
             </form>
         </div>
@@ -106,10 +109,10 @@
                             <small class="text-muted">Limite disponível:</small>
                             <div class="progress" style="height: 8px;">
                                 {% widthratio account.balance account.credit_limit 100 as used_percent %}
-                                <!-- <div class="progress-bar bg-warning" style="width: {{ used_percent|default:'0' }}%">
-                                </div>-->
+                                <div class="progress-bar bg-{{ account.account_color }}" style="width: {{ used_percent|default:'0' }}%">
+                                </div>
                             </div>
-                            <small class="text-muted">R$ {{ account.available_limit|floatformat:2 }} de R$ {{ account.credit_limit|floatformat:2 }}</small>
+                            <small class="text-muted">R$ {{ account.balance|floatformat:2 }} de R$ {{ account.credit_limit|floatformat:2 }}</small>
                         </div>
                         {% endif %}
                     </div>

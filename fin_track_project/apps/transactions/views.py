@@ -39,6 +39,28 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def transactions_list_view(request):
         if request.method == 'GET':
             transactions = Transaction.objects.filter(account__user=request.user)
+
+            date_from = request.GET.get('date_from')
+            if date_from:
+                transactions = transactions.filter(date__gte=date_from)
+            date_to = request.GET.get('date_to')
+            if date_to:
+                transactions = transactions.filter(date__lte=date_to)
+            
+            transaction_type = request.GET.get('transaction_type')
+            if transaction_type:
+                transactions = transactions.filter(transaction_type=transaction_type)
+            
+            account_id = request.GET.get('account')
+            if account_id:
+                transactions = transactions.filter(account__id_account=account_id)
+            
+            category_id = request.GET.get('category')
+            if category_id:
+                transactions = transactions.filter(category__id_category=category_id)
+            
+            transactions = transactions.order_by('-date', '-value')
+            
             accounts = Account.objects.filter(user=request.user, is_active=True)
             categories = Category.objects.filter(user=request.user)
             

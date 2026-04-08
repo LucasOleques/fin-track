@@ -127,12 +127,12 @@
                     <a href="{% url 'transactions:list' %}" class="btn btn-sm btn-outline-primary">Ver todas</a>
                 </div>
                 <div class="card-body p-0">
-                    {% if recent_transactions %}
+                    {% if transactions %}
                         <ul class="list-group list-group-flush">
-                            {% for transaction in recent_transactions %}
+                            {% for transaction in transactions %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="badge bg-{{ transaction.category.color|default:'secondary' }} me-2">
+                                    <span class="badge bg-{{ transaction.category.category_color|default:'secondary' }} me-2">
                                         {{ transaction.category.name|default:'Sem categoria' }}
                                     </span>
                                     <strong>{{ transaction.description|truncatechars:30 }}</strong>
