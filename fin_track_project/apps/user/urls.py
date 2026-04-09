@@ -14,6 +14,12 @@ urlpatterns = [
     path('logout/', views.ClientViewSet.user_logout_view, name='logout'),
     path('password_change', views.ClientViewSet.user_password_change_view, name='password_change'),
     path('register/', views.ClientViewSet.user_register_view, name='register'),
+    path(
+        'update-pending-email/',
+        views.ClientViewSet.user_update_pending_email_view,
+        name='update_pending_email',
+    ),
+    path('verify-email/<uidb64>/<token>/',views.ClientViewSet.user_verify_email_view, name='verify_email'),
     path('profile/', views.ClientViewSet.user_profile_view, name='profile'),
     path('profile_update', views.ClientViewSet.user_profile_update_view, name='profile_update'),
 

@@ -1,0 +1,10 @@
+Ola, {{ user.username }}!
+
+Recebemos o seu cadastro no FinTrack.
+
+Para confirmar que este e-mail e valido e liberar o acesso a sua conta, clique no link abaixo:
+{{ verification_url }}
+
+Se voce nao criou esta conta, pode ignorar esta mensagem.
+
+Equipe FinTrack

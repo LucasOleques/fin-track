@@ -1,6 +1,8 @@
 from .models import Admin, Client
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,6 +24,7 @@ class AdminSerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.ModelSerializer):
     client_email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True, style={'input_type': 'password'}, min_length=8)
+    avatar = serializers.FileField(write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = Client
@@ -31,6 +34,7 @@ class ClientSerializer(serializers.ModelSerializer):
             'client_name',
             'client_email',
             'password',
+            'avatar',
             'date_save',
         ]
         read_only_fields = ('id_client', 'date_save', 'user')
@@ -44,17 +48,25 @@ class ClientSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        avatar = validated_data.pop('avatar', None)
+        avatar_bytes = avatar.read() if avatar else None
+
         admin_user = Admin.objects.create_user(
             username=validated_data['client_name'],
             email=validated_data['client_email'],
-            password=validated_data['password']
+            password=validated_data['password'],
+            is_active=False,
+            email_verified=False,
+            verification_email_sent_at=timezone.now(),
+            avatar=avatar_bytes,
         )
         
         client_user = Client.objects.create(
             user=admin_user,
             client_name=validated_data['client_name'],
             client_email=validated_data['client_email'],
-            password=make_password(validated_data['password'])
+            password=make_password(validated_data['password']),
+            avatar=avatar_bytes,
         )
 
         return client_user

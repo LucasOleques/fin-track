@@ -1,10 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils import timezone
 
 # AbstractUser já recebe username, email, first_name e last_name
 class Admin(AbstractUser):
     date_save = models.DateTimeField(auto_now_add=True)
+    email_verified = models.BooleanField(default=False,help_text='Indica se o e-mail do usuario foi confirmado')
+    verification_email_sent_at = models.DateTimeField(default=timezone.now,help_text='Data e hora do ultimo envio do e-mail de verificacao')
     avatar = models.BinaryField(null=True, blank=True)
     class Meta:
         verbose_name = 'Usuario Admin'

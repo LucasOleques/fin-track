@@ -13,88 +13,73 @@
             <h1>Criar Conta</h1>
             <p class="text-muted">Preencha os dados para se cadastrar</p>
         </div>
-        
-        <form method="post" class="auth-form">
+
+        <div class="alert alert-info small" role="alert">
+            A conta fica pendente ate a confirmacao do e-mail. Depois do cadastro, enviaremos um link com token de verificacao.
+            Se precisar corrigir o endereco, a troca do e-mail sera liberada apos 2 minutos sem confirmacao.
+        </div>
+
+        <form method="post" class="auth-form" enctype="multipart/form-data">
             {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger">
-                    {% for error in form.non_field_errors %}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
-            
+
             <div class="mb-3">
                 <label for="client_name" class="form-label">Nome Completo</label>
-                <input type="text" 
-                       class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
-                       id="client_name" 
-                       name="client_name" 
-                       value="{{ form.client_name.value|default:'' }}"
-                       placeholder="Seu nome completo"
-                       required>
-                {% if form.client_name.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.client_name.errors %}{{ error }}{% endfor %}
-                    </div>
-                {% endif %}
+                <input
+                    type="text"
+                    class="form-control"
+                    id="client_name"
+                    name="client_name"
+                    value="{{ request.POST.client_name|default:'' }}"
+                    placeholder="Seu nome completo"
+                    required
+                >
             </div>
 
             <div class="mb-3">
                 <label for="client_email" class="form-label">E-mail</label>
-                <input type="email" 
-                       class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
-                       id="client_email" 
-                       name="client_email" 
-                       value="{{ form.client_email.value|default:'' }}"
-                       placeholder="seu@email.com"
-                       required>
-                {% if form.email.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.email.errors %}{{ error }}{% endfor %}
-                    </div>
-                {% endif %}
+                <input
+                    type="email"
+                    class="form-control"
+                    id="client_email"
+                    name="client_email"
+                    value="{{ request.POST.client_email|default:'' }}"
+                    placeholder="seu@email.com"
+                    required
+                >
             </div>
-            
+
             <div class="mb-3">
                 <label for="password" class="form-label">Senha</label>
-                <input type="password" 
-                       class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
-                       id="password" 
-                       name="password"
-                       placeholder="Crie uma senha forte"
-                       required>
-                {% if form.password.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.password.errors %}{{ error }}{% endfor %}
-                    </div>
-                {% endif %}
-                <div class="form-text">Mínimo 8 caracteres, com letras e números.</div>
+                <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    placeholder="Crie uma senha forte"
+                    required
+                >
+                <div class="form-text">Minimo 8 caracteres.</div>
             </div>
-            
+
             <div class="mb-4">
                 <label for="password_confirm" class="form-label">Confirmar Senha</label>
-                <input type="password" 
-                       class="form-control {% if form.id_password_confirm.errors %}is-invalid{% endif %}" 
-                       id="password_confirm" 
-                       name="password_confirm"
-                       placeholder="Repita a senha"
-                       required>
-                {% if form.id_password_confirm.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.id_password_confirm.errors %}{{ error }}{% endfor %}
-                    </div>
-                {% endif %}
+                <input
+                    type="password"
+                    class="form-control"
+                    id="password_confirm"
+                    name="password_confirm"
+                    placeholder="Repita a senha"
+                    required
+                >
             </div>
-            
+
             <button type="submit" class="btn btn-primary w-100 btn-lg">
                 <i class="bi bi-person-plus me-2"></i>Cadastrar
             </button>
         </form>
-        
+
         <div class="auth-footer">
-            <p>Já tem uma conta? <a href="{% url 'user:login' %}">Faça login</a></p>
+            <p>Ja tem uma conta? <a href="{% url 'user:login' %}">Faca login</a></p>
         </div>
     </div>
 </div>
