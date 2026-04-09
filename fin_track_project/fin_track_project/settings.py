@@ -179,18 +179,18 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ## Envio de e-mail homologação.
-EMAIL_HOST = config('EMAIL_HOST_HOMO')
-EMAIL_PORT = config('EMAIL_PORT_HOMO', cast=int)
-EMAIL_BACKEND = config('EMAIL_BACKEND_HOMO')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL_HOMO')
+#EMAIL_HOST = config('EMAIL_HOST_HOMO')
+#EMAIL_PORT = config('EMAIL_PORT_HOMO', cast=int)
+#EMAIL_BACKEND = config('EMAIL_BACKEND_HOMO')
+#DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL_HOMO')
 
 ## Envio de e-mail para produção (descomente para usar).
-# EMAIL_HOST = config('EMAIL_HOST')
-# EMAIL_PORT = config('EMAIL_PORT', cast=int)
-# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-# EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
-# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 THOUSAND_SEPARATOR='.',
 USE_THOUSAND_SEPARATOR=True
