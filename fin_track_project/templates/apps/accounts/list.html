@@ -54,9 +54,35 @@
             </form>
         </div>
     </div>
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <div>
+            <span>Total: <strong>{{ accounts|length }} contas</strong></span>
+        </div>
+        <div class="d-flex gap-2">
+            <div>
+                <a href="{% url 'accounts:list' %}?export=csv" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-file-earmark-spreadsheet me-1"></i>Exportar CSV
+                </a>
+                <a href="{% url 'accounts:list' %}?export=pdf" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF
+                </a>
+            </div>
+            <div class="btn-group" role="group">
+                <a href="{% url 'accounts:list' %}?view=list" class="btn btn-outline-secondary btn-sm {% if request.GET.view != 'grid' %}active{% endif %}">
+                    <i class="bi bi-list me-1"></i>Lista
+                </a>
+                <a href="{% url 'accounts:list' %}?view=grid" class="btn btn-outline-secondary btn-sm {% if request.GET.view == 'grid' %}active{% endif %}">
+                    <i class="bi bi-grid me-1"></i>Grade
+                </a>
+            </div>
+        </div>
+    </div>
     
     <!-- Lista de Contas -->
     {% if accounts %}
+        {% if request.GET.view == 'grid' %}
+        <!-- Visualização em Grade -->
         <div class="row g-4">
             {% for account in accounts %}
             <div class="col-md-6 col-lg-4">
@@ -119,7 +145,6 @@
                     <div class="card-footer bg-transparent">
                         <a href="{% url 'accounts:detail' account.id_account %}" class="btn btn-outline-primary btn-sm w-100">
                             <i class="bi bi-arrow-right me-1"></i>Ver Transações
-                            {{ account.bank }}
                         </a>
                     </div>
                 </div>
@@ -154,6 +179,102 @@
             </div>
             {% endfor %}
         </div>
+        
+        {% else %}
+        <!-- Visualização em Lista (padrão) -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 5%"></th>
+                        <th style="width: 20%">Nome</th>
+                        <th style="width: 15%">Banco</th>
+                        <th style="width: 12%">Tipo</th>
+                        <th style="width: 15%">Saldo</th>
+                        <th style="width: 10%">Status</th>
+                        <th style="width: 23%">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for account in accounts %}
+                    <tr class="{% if not account.is_active %}opacity-50{% endif %}">
+                        <td>
+                            <div class="account-icon bg-{{ account.account_color|default:'primary' }} text-white" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                                <i class="bi bi-{{ account.icon|default:'bank' }}"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <strong>{{ account.name }}</strong>
+                        </td>
+                        <td>{{ account.bank }}</td>
+                        <td>
+                            <span class="badge bg-{{ account.account_color }}">
+                                {{ account.get_type_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="{% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %} fw-semibold">
+                                R$ {{ account.balance|floatformat:2 }}
+                            </span>
+                            {% if account.credit_limit %}
+                            <br>
+                            <small class="text-muted">Limite: R$ {{ account.credit_limit|floatformat:2 }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if account.is_active %}
+                            <span class="badge bg-success">Ativa</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inativa</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'accounts:detail' account.id_account %}" class="btn btn-outline-primary" title="Ver detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'accounts:edit' account.id_account %}" class="btn btn-outline-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal{{ account.id_account }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Modal de Exclusão -->
+                    <div class="modal fade" id="deleteModal{{ account.id_account }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Tem certeza que deseja excluir a conta <strong>{{ account.name }}</strong>?</p>
+                                    <p class="text-danger small">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Todas as transações associadas serão excluídas permanentemente.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <form method="post" action="{% url 'accounts:delete' account.id_account %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="bi bi-trash me-1"></i>Excluir
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
         
         {% include 'components/pagination.html' %}
     {% else %}
