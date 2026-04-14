@@ -15,6 +15,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.db.models import Count
 
 from accounts.models import Account
 from logs.audit_logger import registrar_log
@@ -396,9 +397,13 @@ class ClientViewSet(viewsets.GenericViewSet):
     def user_profile_view(request):
         user = request.user
         avatar_base64 = None
-        accounts = Account.objects.filter(user=request.user)
-        active_accounts = accounts.filter(is_active=True).count()
-        total_transactions = sum(account.transactions.count() for account in accounts)
+
+        accounts_with_stats = Account.objects.filter(user=request.user).annotate(
+            num_transactions=Count('transactions')
+        )
+        active_accounts = sum(1 for acc in accounts_with_stats if acc.is_active)
+        total_transactions = sum(acc.num_transactions for acc in accounts_with_stats)
+
         login_time = request.session.get("login_time", "Nao disponivel")
 
         if user.avatar:
@@ -416,7 +421,7 @@ class ClientViewSet(viewsets.GenericViewSet):
             "login_time": login_time,
         }
         return render(request, "apps/user/profile.html", context)
-
+ 
     @login_required
     def user_profile_update_view(request):
         if request.method == "POST":
