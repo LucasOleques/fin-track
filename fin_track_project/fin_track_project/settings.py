@@ -3,6 +3,7 @@ import sys
 from decouple import config
 from datetime import timedelta
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -120,6 +121,14 @@ if DB_ENGINE == 'django.db.backends.postgresql':
             'PASSWORD': config('DB_PASSWORD'),
             'HOST': config('DB_HOST'),
             'PORT': config('DB_PORT', cast=int),
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+            'default': dj_database_url.parse(
+                config('DATABASE_URL'),
+                conn_max_age=600,
+                ssl_require=True
+            )
         }
     }
 else:
