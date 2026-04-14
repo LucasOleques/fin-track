@@ -30,21 +30,15 @@
                             <label class="form-label">Tipo *</label>
                             <div class="btn-group w-100" role="group">
                                 <input type="radio" class="btn-check" name="transaction_type" id="id_transaction_type_despesa" 
-                                       value="despesa" {% if form.instance.transaction_type == 'despesa' or not form.instance.pk %}checked{% endif %} required>
+                                       value="despesa" {% if transaction.transaction_type == 'despesa' or not transaction %}checked{% endif %} required>
                                 <label class="btn btn-outline-danger" for="id_transaction_type_despesa">
                                     <i class="bi bi-arrow-down-circle me-1"></i>Despesa
                                 </label>
                                 
                                 <input type="radio" class="btn-check" name="transaction_type" id="id_transaction_type_receita" 
-                                       value="receita" {% if form.instance.transaction_type == 'receita' %}checked{% endif %} required>
+                                       value="receita" {% if transaction.transaction_type == 'receita' %}checked{% endif %} required>
                                 <label class="btn btn-outline-success" for="id_transaction_type_receita">
                                     <i class="bi bi-arrow-up-circle me-1"></i>Receita
-                                </label>
-
-                                <input type="radio" class="btn-check" name="transaction_type" id="id_transaction_type_transferencia" 
-                                       value="transferencia" {% if form.instance.transaction_type == 'transferencia' %}checked{% endif %} required>
-                                <label class="btn btn-outline-info" for="id_transaction_type_transferencia">
-                                    <i class="bi bi-arrow-left-right me-1"></i>Transferência
                                 </label>
 
                             </div>
@@ -59,10 +53,10 @@
                                        class="form-control {% if form.value.errors %}is-invalid{% endif %}" 
                                        id="id_value" 
                                        name="value" 
-                                       value="{{ form.value.value|default:'' }}"
+                                       value="{{ transaction.value|unlocalize|default:'' }}"
                                        step="0.01"
-                                       min="0.01"
                                        placeholder="0,00"
+                                       min="0.00"
                                        required>
                             </div>
                             {% if form.value.errors %}
@@ -79,7 +73,7 @@
                                    class="form-control {% if form.description.errors %}is-invalid{% endif %}" 
                                    id="id_description" 
                                    name="description" 
-                                   value="{{ form.description.value|default:'' }}"
+                                   value="{{ transaction.description|default:'' }}"
                                    placeholder="Ex: Supermercado, Salário, Aluguel..."
                                    required>
                             {% if form.description.errors %}
@@ -97,7 +91,7 @@
                                        class="form-control {% if form.date.errors %}is-invalid{% endif %}" 
                                        id="id_date" 
                                        name="date" 
-                                       value="{{ form.date.value|date:'Y-m-d'|default:'' }}"
+                                       value="{{ transaction.date|date:'Y-m-d' }}"
                                        required>
                                 {% if form.date.errors %}
                                     <div class="invalid-feedback">
@@ -114,7 +108,7 @@
                                     <option value="">Selecione...</option>
                                     {% for account in accounts %}
                                         <option value="{{ account.id_account }}" 
-                                                {% if form.account.value == account.id_account or request.GET.account == account.id_account %}selected{% endif %}>
+                                                {% if transaction.account.id_account == account.id_account %}selected{% endif %}>
                                             {{ account.name }} ({{ account.get_type_display }})
                                         </option>
                                     {% endfor %}
@@ -135,7 +129,7 @@
                                 {% for category in categories %}
                                     <option value="{{ category.id_category }}" 
                                             data-type="{{ category.type }}"
-                                            {% if form.category.value == category.id_category or request.GET.category == category.id_category%}selected{% endif %}>
+                                            {% if transaction.category and transaction.category.id_category == category.id_category %}selected{% endif %}>
                                         {{ category.name }} ({{ category.get_type_display }})
                                     </option>
                                 {% endfor %}
@@ -152,12 +146,13 @@
                             <label for="id_payment_method" class="form-label">Método de Pagamento</label>
                             <select class="form-select" id="id_payment_method" name="payment_method">
                                 <option value="">Não informado</option>
-                                <option value="money" {% if form.payment_method.value == 'money' %}selected{% endif %}>Dinheiro</option>
-                                <option value="debit" {% if form.payment_method.value == 'debit' %}selected{% endif %}>Débito</option>
-                                <option value="credit" {% if form.payment_method.value == 'credit' %}selected{% endif %}>Crédito</option>
-                                <option value="pix" {% if form.payment_method.value == 'pix' %}selected{% endif %}>PIX</option>
-                                <option value="transfer" {% if form.payment_method.value == 'transfer' %}selected{% endif %}>Transferência</option>
-                                <option value="boleto" {% if form.payment_method.value == 'boleto' %}selected{% endif %}>Boleto</option>
+                                <option value="dinheiro" {% if transaction.payment_method == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
+                                <option value="cartao_debito" {% if transaction.payment_method == 'cartao_debito' %}selected{% endif %}>Débito</option>
+                                <option value="cartao_credito" {% if transaction.payment_method == 'cartao_credito' %}selected{% endif %}>Crédito</option>
+                                <option value="pix" {% if transaction.payment_method == 'pix' %}selected{% endif %}>PIX</option>
+                                <option value="boleto" {% if transaction.payment_method == 'boleto' %}selected{% endif %}>Boleto</option>
+                                <option value="transferencia" {% if transaction.payment_method == 'transferencia' %}selected{% endif %}>Transferência</option>
+                                <option value="outros" {% if transaction.payment_method == 'outros' %}selected{% endif %}>Outros</option>
                             </select>
                         </div>
                         
@@ -165,14 +160,14 @@
                         <div class="mb-4">
                             <label for="id_notes" class="form-label">Observações</label>
                             <textarea class="form-control" id="id_notes" name="notes" rows="2"
-                                      placeholder="Notas adicionais (opcional)">{{ form.notes.value|default:'' }}</textarea>
+                                      placeholder="Notas adicionais (opcional)">{{ transaction.notes|default:'' }}</textarea>
                         </div>
                         
                         <!-- Botões -->
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg me-1"></i>
-                                {% if form.instance.pk %}Salvar{% else %}Registrar{% endif %}
+                                {% if transaction %}Salvar{% else %}Registrar{% endif %}
                             </button>
                             <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">
                                 Cancelar

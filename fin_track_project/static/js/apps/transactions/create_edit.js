@@ -20,9 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let shouldShow = false;
 
-            if (selectedType === 'transferencia') {
-                shouldShow = dataType === 'ambos';
-            } else if (selectedType === 'despesa') {
+            if (selectedType === 'despesa') {
                 shouldShow = dataType === 'despesa';
             } else if (selectedType === 'receita') {
                 shouldShow = dataType === 'receita';

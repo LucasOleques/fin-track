@@ -7,7 +7,6 @@ class Transaction(models.Model):
     TRANSACTION_TYPES = [
         ('receita', 'Receita'),
         ('despesa', 'Despesa'),
-        ('transferencia', 'Transferência'),
     ]
 
     PAYMENT_METHOD = [
@@ -16,7 +15,8 @@ class Transaction(models.Model):
         ('cartao_debito', 'Cartão de Débito'),
         ('pix', 'Pix'),
         ('boleto', 'Boleto'),
-        ('outro', 'Outro'),
+        ('transferencia', 'Transferência'),
+        ('outros', 'Outros'),
     ]
 
     id_transaction = models.AutoField(primary_key=True)

@@ -32,13 +32,13 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     @login_required
     def transactions_form_view(request):
-        form_transactions = Transaction.objects.filter(account__user=request.user)
+        form_transactions = Transaction.objects.filter(user=request.user)
         return render(request, 'apps/transactions/create_edit.html', {'form_transactions': form_transactions})
 
     @login_required
     def transactions_list_view(request):
         if request.method == 'GET':
-            transactions = Transaction.objects.filter(account__user=request.user)
+            transactions = Transaction.objects.filter(user=request.user)
 
             date_from = request.GET.get('date_from')
             if date_from:
@@ -66,9 +66,11 @@ class TransactionViewSet(viewsets.ModelViewSet):
             
             total_receita = transactions.filter(transaction_type='receita').aggregate(total=Sum('value'))['total'] or 0
             total_despesa = transactions.filter(transaction_type='despesa').aggregate(total=Sum('value'))['total'] or 0
-            total_balanco = transactions.aggregate(total=Sum('value'))['total'] or 0
-            saldo = total_receita - total_despesa
+            
+            total_balanco = Account.objects.filter(user=request.user).aggregate(total=Sum('balance'))['total'] or 0
 
+            total_balanco = total_receita + total_despesa
+            saldo = total_receita - total_despesa
         return render(request, 'apps/transactions/list.html', {
                         'transactions': transactions,
                         'total_receita': total_receita,

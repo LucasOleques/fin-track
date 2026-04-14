@@ -56,7 +56,7 @@ class AccountViewSet(viewsets.ModelViewSet):
             bank = request.POST.get('bank')
             type = request.POST.get('type')
             account_color = request.POST.get('account_color')
-            balance = request.POST.get('balance')
+            balance = 0.00
             credit_limit = request.POST.get('credit_limit')
             is_active = request.POST.get('is_active')
 
@@ -94,7 +94,7 @@ class AccountViewSet(viewsets.ModelViewSet):
                 'bank': request.POST.get('bank'),
                 'type': request.POST.get('type'),
                 'account_color': request.POST.get('account_color'),
-                'balance': request.POST.get('balance'),
+                'balance': account.balance if account else 0,
                 'credit_limit': request.POST.get('credit_limit') or 0,
                 'is_active': request.POST.get('is_active') == 'on',
             }

@@ -94,7 +94,6 @@
                     <label class="form-label">Tipo</label>
                     <select class="form-select" name="transaction_type">
                         <option value="">Todos</option>
-                        <option value="transferencia" {% if request.GET.transaction_type == 'transferencia' %}selected{% endif %}>Transferência</option>
                         <option value="receita" {% if request.GET.transaction_type == 'receita' %}selected{% endif %}>Receitas</option>
                         <option value="despesa" {% if request.GET.transaction_type == 'despesa' %}selected{% endif %}>Despesas</option>
                     </select>
