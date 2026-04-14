@@ -37,7 +37,7 @@ A intenção do projeto, não é um CRUD simples. O projeto foi pensado e estrut
 
 - Dashboard com saldo total, receitas do mes, despesas do mes, contas ativas e ultimas transacoes.
 - Cadastro e gestao de contas financeiras com tipo, cor, limite e status ativo/inativo.
-- Cadastro de categorias para receitas, despesas ou ambos.
+- Cadastro de categorias para receitas ou despesas.
 - Registro de transacoes com filtros por periodo, tipo, conta e categoria.
 - Atualizacao automatica de saldo da conta em criacao e exclusao de transacoes.
 - Area de usuario com login por username ou e-mail, cadastro, perfil, avatar, troca de senha e recuperacao de senha.

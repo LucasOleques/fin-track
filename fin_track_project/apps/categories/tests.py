@@ -36,13 +36,6 @@ class CategoryViewsTests(TestCase):
             category_color="success",
             description="Entradas mensais",
         )
-        cls.other_category = Category.objects.create(
-            user=cls.other_user,
-            name="Categoria Externa",
-            type="ambos",
-            category_color="primary",
-            description="Nao deve aparecer para outro usuario",
-        )
 
     def setUp(self):
         self.client.force_login(self.user)

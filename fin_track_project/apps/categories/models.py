@@ -5,13 +5,11 @@ class Category(models.Model):
     CATEGORY_TYPES = [
         ('despesa', 'Despesa'),
         ('receita', 'Receita'),
-        ('ambos', 'Ambos'),
     ]
         
     CATEGORY_COLOR = [
             ('danger', 'Vermelho'),
             ('success', 'Verde'),
-            ('primary', 'Azul'),
     ]
 
     id_category = models.AutoField(primary_key=True)

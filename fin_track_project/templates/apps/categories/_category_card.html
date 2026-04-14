@@ -11,7 +11,7 @@
                         <span class="badge bg-{% if category.type == 'despesa' %}danger{% elif category.type == 'receita' %}success{% else %}info{% endif %}">
                             {% if category.type == 'despesa' %}Despesa
                             {% elif category.type == 'receita' %}Receita
-                            {% elif category.type == 'ambos' %}Ambos{% endif %}
+                            {% endif %}
                         </span>
                     </div>
                 </div>
