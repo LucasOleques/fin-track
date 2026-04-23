@@ -11,6 +11,32 @@
             <p class="text">Seja bem-vindo ao seu gerenciador de finanças.</p>
             <p class="text-muted mb-0">Resumo das suas finanças</p>
         </div>
+            <!-- Filtros -->
+            <div class="card mb-1">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+
+                        <!-- Data -->
+                        <div class="col-md-4">
+                            <label class="form-label">De</label>
+                            <input type="date" class="form-control" name="date_from" value="{{ date_from }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Até</label>
+                            <input type="date" class="form-control" name="date_to" value="{{ date_to }}">
+                        </div>
+
+                        <div class="col-md-2 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-outline-primary flex-grow-1" title="Pesquisar com os filtros selecionados">
+                                <i class="bi bi-search"></i>
+                            </button>
+                            <a href="{% url 'dashboard' %}?date_from=&amp;date_to=" class="btn btn-outline-secondary" title="Limpar filtros e ver tudo">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         <div>
             <a href="{% url 'transactions:create' %}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i>Nova Transação
@@ -24,7 +50,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <p class="card-subtitle mb-2 opacity-75">Saldo Total</p>
+                            <p class="card-subtitle mb-2 opacity-75">Saldo do Período</p>
                             <h3 class="card-title mb-0">R$ {{ total_balance|floatformat:2 }}</h3>
                         </div>
                         <div class="card-icon">
@@ -40,8 +66,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <p class="card-subtitle mb-2 opacity-75">Receitas (mês)</p>
-                            <h3 class="card-title mb-0">R$ {{ monthly_income|floatformat:2 }}</h3>
+                            <p class="card-subtitle mb-2 opacity-75">Receitas no Período</p>
+                            <h3 class="card-title mb-0">R$ {{ period_income|floatformat:2 }}</h3>
                         </div>
                         <div class="card-icon">
                             <i class="bi bi-arrow-up-circle"></i>
@@ -56,8 +82,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <p class="card-subtitle mb-2 opacity-75">Despesas (mês)</p>
-                            <h3 class="card-title mb-0">R$ {{ monthly_expenses|floatformat:2 }}</h3>
+                            <p class="card-subtitle mb-2 opacity-75">Despesas no Período</p>
+                            <h3 class="card-title mb-0">R$ {{ period_expenses|floatformat:2 }}</h3>
                         </div>
                         <div class="card-icon">
                             <i class="bi bi-arrow-down-circle"></i>
@@ -101,9 +127,18 @@
                                     <a href="{% url 'accounts:detail' account.id_account %}" class="text-dark text-decoration-none"><strong>{{ account.name }}</strong></a>
                                     <small class="text-muted d-block">{{ account.bank }}</small>
                                 </div>
-                                <span class="{% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %} fw-bold">
-                                    R$ {{ account.balance|floatformat:2 }}
-                                </span>
+                                {% if account.type == 'poupanca' %}
+                                    <span class="text-dark small me-2 opacity-75" title="Contas de poupança não são incluídas no saldo total">
+                                        Não soma com o saldo total.
+                                    </span>
+                                    <span class="{% if account.period_balance >= 0 %}text-success{% else %}text-danger{% endif %} fw-bold" title="Balanço da conta no período selecionado">
+                                        R$ {{ account.period_balance|floatformat:2 }}
+                                    </span>
+                                {% else %}
+                                    <span class="{% if account.period_balance >= 0 %}text-success{% else %}text-danger{% endif %} fw-bold" title="Balanço da conta no período selecionado">
+                                        R$ {{ account.period_balance|floatformat:2 }}
+                                    </span>
+                                {% endif %}
                             </li>
                             {% endfor %}
                         </ul>
@@ -138,10 +173,19 @@
                                     <strong>{{ transaction.description|truncatechars:30 }}</strong>
                                     <small class="text-muted d-block">{{ transaction.date|date:"d/m/Y" }}</small>
                                 </div>
-                                <span class="{% if transaction.transaction_type == 'receita' %}text-success{% else %}text-danger{% endif %} fw-bold">
-                                    {% if transaction.transaction_type == 'receita' %}+{% else %}-{% endif %}
-                                    R$ {{ transaction.value|floatformat:2 }}
+                                {% if transaction.account.type == 'poupanca' %}
+                                    <span class="text-dark small me-2 opacity-75" title="Contas de poupança não são incluídas no saldo total">
+                                        Não soma com a receita.
+                                    </span>
+                                    <span class="{% if transaction.transaction_type == 'receita' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                    R$ {% if transaction.transaction_type == 'receita' %}{% else %}-{% endif %}
+                                    {{ transaction.value|floatformat:2 }}
+                                {% else %}
+                                    <span class="{% if transaction.transaction_type == 'receita' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                    R$ {% if transaction.transaction_type == 'receita' %}{% else %}-{% endif %}
+                                    {{ transaction.value|floatformat:2 }}
                                 </span>
+                                {% endif %}
                             </li>
                             {% endfor %}
                         </ul>
