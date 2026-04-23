@@ -1,6 +1,11 @@
 from .models import Transaction
 from .serializer import TransactionSerializer
 
+from accounts.models import Account
+from categories.models import Category
+
+from fin_track_project.views import avatar_view
+
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -10,9 +15,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
-from accounts.models import Account
-from categories.models import Category
 
 from django.db.models import Sum
 
@@ -32,11 +34,17 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     @login_required
     def transactions_form_view(request):
+        avatar_base64 = avatar_view(request)
         form_transactions = Transaction.objects.filter(user=request.user)
-        return render(request, 'apps/transactions/create_edit.html', {'form_transactions': form_transactions})
+        context = {
+            'form_transactions': form_transactions,
+            'avatar_base64': avatar_base64
+        }
+        return render(request, 'apps/transactions/create_edit.html', context)
 
     @login_required
     def transactions_list_view(request):
+        avatar_base64 = avatar_view(request)
         if request.method == 'GET':
             transactions = Transaction.objects.filter(user=request.user)
 
@@ -71,18 +79,22 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
             total_balanco = total_receita + total_despesa
             saldo = total_receita - total_despesa
-        return render(request, 'apps/transactions/list.html', {
+
+            context = {
                         'transactions': transactions,
                         'total_receita': total_receita,
                         'total_despesa': total_despesa,
                         'total_balanco': total_balanco,
                         'saldo': saldo,
                         'accounts': accounts,
-                        'categories': categories
-                        })
+                        'categories': categories,
+                        'avatar_base64': avatar_base64
+                        }
+        return render(request, 'apps/transactions/list.html', context)
 
     @login_required
     def transactions_create(request):
+        avatar_base64 = avatar_view(request)
         if request.method == 'POST':
 
             account = request.POST.get('account')
@@ -121,14 +133,17 @@ class TransactionViewSet(viewsets.ModelViewSet):
         
         accounts = Account.objects.filter(user=request.user, is_active=True)
         categories = Category.objects.filter(user=request.user)
-        
-        return render(request, 'apps/transactions/create_edit.html', {
+
+        context = {
             'accounts': accounts,
-            'categories': categories
-        })
+            'categories': categories,
+            'avatar_base64': avatar_base64
+        }
+        return render(request, 'apps/transactions/create_edit.html', context)
     
     @login_required
     def transactions_edit_view(request, pk):
+        avatar_base64 = avatar_view(request)
         transaction = Transaction.objects.filter(user=request.user,id_transaction=pk, account__user=request.user).first()
 
         if not transaction:
@@ -179,15 +194,18 @@ class TransactionViewSet(viewsets.ModelViewSet):
         
         accounts = Account.objects.filter(user=request.user, is_active=True)
         categories = Category.objects.filter(user=request.user)
-        
-        return render(request, 'apps/transactions/create_edit.html', {
+
+        context = {
             'transaction': transaction,
             'accounts': accounts,
-            'categories': categories
-        })
+            'categories': categories,
+            'avatar_base64': avatar_base64
+        }
+        return render(request, 'apps/transactions/create_edit.html', context)
     
     @login_required
     def transactions_delete_view(request, pk):
+        avatar_base64 = avatar_view(request)
         transaction = Transaction.objects.filter(user=request.user,id_transaction=pk, account__user=request.user).first()
 
         if not transaction:
@@ -202,5 +220,10 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 messages.error(request, f"Erro ao excluir a transação: {str(e)}")
             
             return redirect('transactions:list')
+        
+        context = {
+            'transaction': transaction,
+            'avatar_base64': avatar_base64
+            }
 
-        return render(request, 'apps/transactions/list.html', {'transaction': transaction})
+        return render(request, 'apps/transactions/list.html', context)

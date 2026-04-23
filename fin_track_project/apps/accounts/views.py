@@ -1,3 +1,5 @@
+from fin_track_project.views import avatar_view
+
 from .models import Account
 from .serializer import AccountSerializer
 
@@ -21,6 +23,7 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     @login_required
     def accounts_list_view(request):
+        avatar_base64 = avatar_view(request)
         accounts = Account.objects.filter(user=request.user)
 
         bank = request.GET.get('bank')
@@ -36,20 +39,32 @@ class AccountViewSet(viewsets.ModelViewSet):
             accounts = accounts.filter(is_active=(is_active == 'True'))
 
         accounts = accounts.order_by('name')
-        return render(request, 'apps/accounts/list.html', {'accounts': accounts})
+        
+        context = {
+            'accounts': accounts,
+            'avatar_base64': avatar_base64,
+        }
+        return render(request, 'apps/accounts/list.html', context)
 
     @login_required
     def accounts_detail_view(request, pk):
+        avatar_base64 = avatar_view(request)
         account = Account.objects.filter(user=request.user, pk=pk).first()
 
         if not account:
             messages.error(request, "Conta não encontrada.")
             return redirect('accounts:list')
         
-        return render(request, 'apps/accounts/detail.html', {'account': account, 'pk': pk })
+        context = {
+            'account': account,
+            'pk': pk,
+            'avatar_base64': avatar_base64
+            }
+        return render(request, 'apps/accounts/detail.html', context)
 
     @login_required
     def accounts_create_view(request):
+        avatar_base64 = avatar_view(request)
         if request.method == 'POST':
 
             name = request.POST.get('name')
@@ -78,10 +93,15 @@ class AccountViewSet(viewsets.ModelViewSet):
                 for field_errors in serializer.errors.values():
                     for error in field_errors:
                         messages.error(request, error)
-        return render(request, 'apps/accounts/create.html')
+
+        context = {
+            'avatar_base64': avatar_base64
+        }
+        return render(request, 'apps/accounts/create.html', context)
 
     @login_required
     def accounts_edit_view(request, pk):
+        avatar_base64 = avatar_view(request)
         account = Account.objects.filter(user=request.user, pk=pk).first()
 
         if not account:
@@ -110,10 +130,15 @@ class AccountViewSet(viewsets.ModelViewSet):
                     for error in errors:
                         messages.error(request, f"{field}: {error}")
 
-        return render(request, 'apps/accounts/edit.html', {'account': account})
+        context = {
+            'account': account,
+            'avatar_base64': avatar_base64
+            }
+        return render(request, 'apps/accounts/edit.html', context)
 
     @login_required
     def accounts_delete_view(request, pk):
+        avatar_base64 = avatar_view(request)
         account = Account.objects.filter(user=request.user, pk=pk).first()
 
         if not account:
@@ -128,5 +153,9 @@ class AccountViewSet(viewsets.ModelViewSet):
                 messages.error(request, f"Erro ao excluir a conta: {str(e)}")
             
             return redirect('accounts:list')
-
-        return render(request, 'apps/accounts/delete.html', {'account': account})
+        
+        context = {
+            'account': account,
+            'avatar_base64': avatar_base64
+        }
+        return render(request, 'apps/accounts/delete.html', context)

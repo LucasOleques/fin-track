@@ -1,5 +1,6 @@
 from .models import Category
 from .serializer import CategorySerializer
+from fin_track_project.views import avatar_view
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -20,11 +21,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     @login_required
     def categories_list_view(request):
+        avatar_base64 = avatar_view(request)
         categories = Category.objects.filter(user=request.user)
-        return render(request, 'apps/categories/list.html', {'categories': categories})
+
+        context = {
+            'categories': categories,
+            'avatar_base64': avatar_base64
+        }
+        return render(request, 'apps/categories/list.html', context)
 
     @login_required
     def categories_create_view(request):
+        avatar_base64 = avatar_view(request)
         if request.method == 'POST':
 
             name = request.POST.get('name')
@@ -50,12 +58,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
                         messages.error(request, error)
 
         context = {
-            'category_color': Category.CATEGORY_COLOR
+            'category_color': Category.CATEGORY_COLOR,
+            'avatar_base64': avatar_base64
         }
         return render(request, 'apps/categories/create_edit.html', context)
     
     @login_required
     def categories_edit_view(request, pk):
+        avatar_base64 = avatar_view(request)
         category = Category.objects.filter(user=request.user, id_category=pk).first()
         
         if not category:
@@ -86,13 +96,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
         context = {
             'category': category,
-            'category_color': Category.CATEGORY_COLOR
+            'category_color': Category.CATEGORY_COLOR,
+            'avatar_base64': avatar_base64
         }
         return render(request, 'apps/categories/create_edit.html', context)
 
 
     @login_required
     def categories_delete_view(request, pk):
+        avatar_base64 = avatar_view(request)
         category = Category.objects.filter(user=request.user, id_category=pk).first()
 
         if not category:
@@ -107,5 +119,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 messages.error(request, f"Erro ao excluir a categoria: {str(e)}")
             
             return redirect('categories:list')
-
-        return render(request, 'apps/categories/delete.html', {'category': category})
+        
+        context = {
+            'category': category,
+            'avatar_base64': avatar_base64
+        }
+        return render(request, 'apps/categories/delete.html', context)

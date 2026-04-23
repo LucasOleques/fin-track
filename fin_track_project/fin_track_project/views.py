@@ -1,4 +1,5 @@
 import calendar
+import base64
 from decimal import Decimal
 from django.db.models import Sum, Q, F
 from django.db.models.functions import Coalesce
@@ -18,6 +19,7 @@ def base_view(request):
     
 @login_required
 def dashboard_view(request):
+    avatar_base64 = avatar_view(request)
     base_accounts = Account.objects.filter(user=request.user).order_by('name')
     active_accounts = base_accounts.filter(is_active=True).count()
 
@@ -69,6 +71,7 @@ def dashboard_view(request):
         'period_expenses': period_expenses,
         'date_from': date_from,
         'date_to': date_to,
+        'avatar_base64': avatar_base64,
     }
 
     return render(request, 'dashboard.html', context)
@@ -84,3 +87,19 @@ def navbar_view(request):
 @login_required
 def pagination_view(request):
     return render(request, 'components/pagination.html')
+
+@login_required
+def avatar_view(request):
+    # Carrega o avatar do usuário para ser exibido na navbar
+    avatar_base64 = None
+    if hasattr(request.user, 'avatar') and request.user.avatar:
+        try:
+            # O campo 'avatar' contém os bytes da imagem diretamente
+            avatar_data = request.user.avatar
+            if isinstance(avatar_data, bytes):
+                avatar_base64 = base64.b64encode(avatar_data).decode('utf-8')
+        except (TypeError, ValueError):
+            # Falha silenciosamente se a codificação der errado
+            pass
+
+    return avatar_base64
