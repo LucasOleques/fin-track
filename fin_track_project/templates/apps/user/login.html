@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Login - FinTrack{% endblock %}
+{% block title %}Login – FinTrack{% endblock %}
 
 {% block content %}
 <div class="auth-container">
@@ -11,23 +11,20 @@
                 <i class="bi bi-wallet2"></i>
             </div>
             <h1>FinTrack</h1>
-            <p class="text-muted">Faca login para acessar sua area financeira</p>
+            <p>Faça login para acessar sua área financeira</p>
         </div>
 
         {% if pending_verification %}
-        <div
-            class="alert alert-warning small"
-            id="pending-email-timer"
-            data-remaining-seconds="{{ pending_verification.remaining_seconds }}"
-        >
-            <div>
-                Validação pendente para <strong>{{ pending_verification.email }}</strong>.
-            </div>
+        <div class="alert alert-warning small"
+             id="pending-email-timer"
+             data-remaining-seconds="{{ pending_verification.remaining_seconds }}">
+            <i class="bi bi-exclamation-circle me-1"></i>
+            Validação pendente para <strong>{{ pending_verification.email }}</strong>.
             <div class="mt-1" data-timer-text>
                 {% if pending_verification.change_available %}
-                    Você ja pode corrigir o e-mail pendente.
+                    Você já pode corrigir o e-mail pendente.
                 {% else %}
-                    Correção do e-mail disponível em {{ pending_verification.remaining_text }}.
+                    Correção disponível em {{ pending_verification.remaining_text }}.
                 {% endif %}
             </div>
         </div>
@@ -37,80 +34,61 @@
             {% csrf_token %}
 
             <div class="mb-3">
-                <label for="id_username" class="form-label">
-                    <i class="bi bi-person me-1"></i>Usuário ou E-mail
-                </label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="id_username"
-                    name="username"
-                    value="{{ request.POST.username|default:'' }}"
-                    placeholder="Digite seu usuário ou e-mail"
-                    required
-                >
+                <label for="id_username" class="form-label">Usuário ou E-mail</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="id_username" name="username"
+                           value="{{ request.POST.username|default:'' }}"
+                           placeholder="Digite seu usuário ou e-mail" required>
+                </div>
             </div>
 
             <div class="mb-3">
-                <label for="id_password" class="form-label">
-                    <i class="bi bi-lock me-1"></i>Senha
-                </label>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="id_password" class="form-label mb-0">Senha</label>
+                </div>
                 <div class="input-group">
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="id_password"
-                        name="password"
-                        placeholder="Digite sua senha"
-                        required
-                    >
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" id="id_password" name="password"
+                           placeholder="Digite sua senha" required>
                     <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                         <i class="bi bi-eye"></i>
                     </button>
                 </div>
+                <a href="{% url 'user:password_reset' %}" class="form-label link-hint">Esqueceu a senha?</a>
             </div>
 
-            <div class="mb-3 form-check">
-                <input
-                    type="checkbox"
-                    class="form-check-input"
-                    id="remember"
-                    name="remember"
-                    {% if request.POST.remember %}checked{% endif %}
-                >
-                <label class="form-check-label" for="remember">Lembrar de mim</label>
-                <div class="form-text small">
-                    Mantém sua sessão ativa por ate 14 dias neste dispositivo.
-                </div>
+            <div class="mb-4 form-check">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember"
+                       {% if request.POST.remember %}checked{% endif %}>
+                <label class="form-check-label text-sm" for="remember">
+                    Lembrar de mim
+                    <span class="form-label text-xs">(14 dias)</span>
+                </label>
             </div>
 
             <button type="submit" class="btn btn-primary w-100 btn-lg">
-                <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                <i class="bi bi-box-arrow-in-right"></i>Entrar
             </button>
         </form>
 
         <div class="auth-footer">
-            <p>Não tem uma conta? <a href="{% url 'user:register' %}">Cadastre-se</a></p>
-            <a href="{% url 'user:password_reset' %}" class="text-muted small">Esqueceu a senha?</a>
+            <p class="mb-2">Não tem uma conta? <a href="{% url 'user:register' %}">Cadastre-se grátis</a></p>
             <div class="mt-2">
-                <div class="form-text small">
-                    <a
-                        href="{% url 'user:update_pending_email' %}"
-                        class="text-muted small {% if pending_verification and not pending_verification.change_available %}pe-none opacity-50{% endif %}"
-                        {% if pending_verification and not pending_verification.change_available %}aria-disabled="true"{% endif %}
-                        data-update-email-link
-                    >
-                        {% if pending_verification %}
-                            {% if pending_verification.change_available %}
-                                Não confirmou o e-mail? Corrija o endereço agora.
-                            {% else %}
-                                Não confirmou o e-mail? Aguarde o timer para corrigir o endereço.
-                            {% endif %}
+                <a href="{% url 'user:update_pending_email' %}"
+                   class="text-muted link-hint {% if pending_verification and not pending_verification.change_available %}pe-none opacity-50{% endif %}"
+                   {% if pending_verification and not pending_verification.change_available %}aria-disabled="true"{% endif %}
+                   data-update-email-link>
+                    {% if pending_verification %}
+                        {% if pending_verification.change_available %}
+                            Corrigir e-mail de verificação
                         {% else %}
-                            Não confirmou o e-mail? Corrija o endereço de e-mail após 2 minutos.
+                            Aguarde o timer para corrigir o e-mail
                         {% endif %}
-                    </a>
-                </div>
+                    {% else %}
+                        Não confirmou o e-mail? Corrija após 2 minutos.
+                    {% endif %}
+                </a>
             </div>
         </div>
     </div>

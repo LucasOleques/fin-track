@@ -1,149 +1,135 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Transações - FinTrack{% endblock %}
+{% block title %}Transações – FinTrack{% endblock %}
 
 {% block content %}
 {% load l10n %}
-<div class="container py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container py-2">
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-3">
         <div>
-            <h1 class="h3 mb-1">Transações</h1>
-            <p class="text-muted mb-0">Histórico de todas as suas movimentações</p>
+            <h1 class="page-title">Transações</h1>
+            <p class="page-subtitle">Histórico de todas as suas movimentações</p>
         </div>
-        <a href="{% url 'transactions:create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i>Nova Transação
+        <a href="{% url 'transactions:create' %}" class="btn btn-primary flex-shrink-0">
+            <i class="bi bi-plus-lg"></i>Nova Transação
         </a>
     </div>
-    
-    <!-- Cards de Resumo -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="card bg-success bg-opacity-10 border-success">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <p class="text-success mb-1">Total Receitas</p>
-                            <h4 class="text-success mb-0">R$ {{ total_receita|floatformat:2 }}</h4>
-                        </div>
-                        <i class="bi bi-arrow-up-circle text-success" style="font-size: 2rem;"></i>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">Total Receitas</p>
+                        <p class="stat-value stat-value-success">R$ {{ total_receita|floatformat:2 }}</p>
+                    </div>
+                    <div class="stat-icon stat-icon-success">
+                        <i class="bi bi-arrow-up-circle"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-danger bg-opacity-10 border-danger">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <p class="text-danger mb-1">Total Despesas</p>
-                            <h4 class="text-danger mb-0">R$ {{ total_despesa|floatformat:2 }}</h4>
-                        </div>
-                        <i class="bi bi-arrow-down-circle text-danger" style="font-size: 2rem;"></i>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">Total Despesas</p>
+                        <p class="stat-value stat-value-danger">R$ {{ total_despesa|floatformat:2 }}</p>
+                    </div>
+                    <div class="stat-icon stat-icon-danger">
+                        <i class="bi bi-arrow-down-circle"></i>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-3">
-            <div class="card bg-primary bg-opacity-10 border-primary">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <p class="text-primary mb-1">Balanço</p>
-                            <h4 class="text-primary mb-0">R$ {{ total_balanco|floatformat:2 }}</h4>
-                        </div>
-                        <i class="bi bi-wallet2 text-primary" style="font-size: 2rem;"></i>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">Balanço</p>
+                        <p class="stat-value">R$ {{ total_balanco|floatformat:2 }}</p>
+                    </div>
+                    <div class="stat-icon stat-icon-primary">
+                        <i class="bi bi-wallet2"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-black bg-opacity-10 border-black">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <p class="text-black mb-1">Saldo</p>
-                            <h4 class="text-black mb-0">R$ {{ saldo|floatformat:2 }}</h4>
-                        </div>
-                        <i class="bi bi-wallet2 text-black" style="font-size: 2rem;"></i>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">Saldo Total</p>
+                        <p class="stat-value">R$ {{ saldo|floatformat:2 }}</p>
+                    </div>
+                    <div class="stat-icon stat-icon-muted">
+                        <i class="bi bi-piggy-bank"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Filtros -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
 
-                <!-- Data -->
-                <div class="col-md-2">
-                    <label class="form-label">De</label>
-                    <input type="date" class="form-control" name="date_from" value="{{ request.GET.date_from }}">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Até</label>
-                    <input type="date" class="form-control" name="date_to" value="{{ request.GET.date_to }}">
-                </div>
-                
-                <!-- Tipo de Transação -->
-                <div class="col-md-2">
-                    <label class="form-label">Tipo</label>
-                    <select class="form-select" name="transaction_type">
-                        <option value="">Todos</option>
-                        <option value="receita" {% if request.GET.transaction_type == 'receita' %}selected{% endif %}>Receitas</option>
-                        <option value="despesa" {% if request.GET.transaction_type == 'despesa' %}selected{% endif %}>Despesas</option>
-                    </select>
-                </div>
-
-                <!-- Conta -->
-                <div class="col-md-2">
-                    <label for="id_account" class="form-label">Conta</label>
-                    <select class="form-select" name="account">
-                        <option value="">Todas</option>
-                        {% for account in accounts %}
-                            <option value="{{ account.id_account }}" 
-                                    {% if request.GET.account == account.id_account|stringformat:'d' %}selected{% endif %}>
-                                {{ account.name }} ({{ account.get_type_display }})
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <!-- Categoria -->
-                <div class="col-md-2">
-                    <label for="id_category" class="form-label">Categoria</label>
-                    <select class="form-select" id="id_category" name="category">
-                        <option value="">Todas</option>
-                        {% for category in categories %}
-                            <option value="{{ category.id_category }}" {% if request.GET.category == category.id_category|stringformat:'d' %}selected{% endif %}
-                                    >
-                                {{ category.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-outline-primary flex-grow-1">
-                        <i class="bi bi-search"></i>
-                    </button>
-                    <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">
-                        <i class="bi bi-x-lg"></i>
-                    </a>
-                </div>
-            </form>
-        </div>
+    <div class="filter-section">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-sm-6 col-md-2">
+                <label class="form-label">De</label>
+                <input type="date" class="form-control form-control-sm" name="date_from" value="{{ request.GET.date_from }}">
+            </div>
+            <div class="col-sm-6 col-md-2">
+                <label class="form-label">Até</label>
+                <input type="date" class="form-control form-control-sm" name="date_to" value="{{ request.GET.date_to }}">
+            </div>
+            <div class="col-sm-6 col-md-2">
+                <label class="form-label">Tipo</label>
+                <select class="form-select form-select-sm" name="transaction_type">
+                    <option value="">Todos</option>
+                    <option value="receita" {% if request.GET.transaction_type == 'receita' %}selected{% endif %}>Receitas</option>
+                    <option value="despesa" {% if request.GET.transaction_type == 'despesa' %}selected{% endif %}>Despesas</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-2">
+                <label class="form-label">Conta</label>
+                <select class="form-select form-select-sm" name="account">
+                    <option value="">Todas</option>
+                    {% for account in accounts %}
+                        <option value="{{ account.id_account }}"
+                                {% if request.GET.account == account.id_account|stringformat:'d' %}selected{% endif %}>
+                            {{ account.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-2">
+                <label class="form-label">Categoria</label>
+                <select class="form-select form-select-sm" id="id_category" name="category">
+                    <option value="">Todas</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id_category }}"
+                                {% if request.GET.category == category.id_category|stringformat:'d' %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1" title="Filtrar">
+                    <i class="bi bi-search"></i>Filtrar
+                </button>
+                <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary btn-sm" title="Limpar">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+        </form>
     </div>
-    
-    <!-- Lista de Transações -->
+
     <div class="card">
         {% if transactions %}
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table table-hover align-middle">
+                    <thead>
                         <tr>
                             <th>Data</th>
                             <th>Descrição</th>
@@ -157,19 +143,18 @@
                         {% for transaction in transactions %}
                         <tr>
                             <td>
-                                <span class="text-muted">{{ transaction.date|date:"d/m/Y" }}</span>
+                                <span class="text-muted text-xs">{{ transaction.date|date:"d/m/Y" }}</span>
                             </td>
                             <td>
-                                <span>{{ transaction.description }}</span>
+                                <span class="fw-medium">{{ transaction.description }}</span>
                                 {% if transaction.notes %}
-                                    <i class="bi bi-chat-text text-muted ms-1" 
+                                    <i class="bi bi-chat-text text-muted ms-1"
                                        data-bs-toggle="tooltip" title="{{ transaction.notes }}"></i>
                                 {% endif %}
                             </td>
                             <td>
                                 <span class="badge bg-{{ transaction.account.account_color|default:'secondary' }}">
-                                        <i class="bi bi-bank me-1" style="color: aliceblue;"></i>
-                                        {{ transaction.account.name }}
+                                    <i class="bi bi-bank me-1"></i>{{ transaction.account.name }}
                                 </span>
                             </td>
                             <td>
@@ -178,7 +163,7 @@
                                 </span>
                             </td>
                             <td class="text-end">
-                                <span class="{% if transaction.transaction_type == 'receita' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                <span class="fw-semibold {% if transaction.transaction_type == 'receita' %}text-success{% else %}text-danger{% endif %}">
                                     {% if transaction.transaction_type == 'receita' %}
                                         <i class="bi bi-arrow-up-short"></i>
                                     {% else %}
@@ -189,49 +174,19 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{% url 'transactions:edit' transaction.id_transaction %}" 
+                                    <a href="{% url 'transactions:edit' transaction.id_transaction %}"
                                        class="btn btn-outline-secondary" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn btn-outline-danger" 
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ transaction.id_transaction }}"
+                                    <button type="button" class="btn btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal{{ transaction.id_transaction }}"
                                             title="Excluir">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
-                        
-                        <!-- Modal de Exclusão -->
-                        <div class="modal fade" id="deleteModal{{ transaction.id_transaction }}" tabindex="-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Confirmar Exclusão</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Deseja excluir a transação:</p>
-                                        <p class="mb-0">
-                                            <strong>{{ transaction.description }}</strong><br>
-                                            <span class="text-muted">{{ transaction.date|date:"d/m/Y" }}</span> -
-                                            <span class="{% if transaction.transaction_type == 'receita' %}text-success{% else %}text-danger{% endif %}">
-                                                R$ {{ transaction.value|floatformat:2 }}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <form method="post" action="{% url 'transactions:delete' transaction.id_transaction %}" class="d-inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger">
-                                                <i class="bi bi-trash me-1"></i>Excluir
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -239,26 +194,56 @@
             <div class="card-footer">
                 {% include 'components/pagination.html' %}
             </div>
+
+            {% for transaction in transactions %}
+            <div class="modal fade" id="deleteModal{{ transaction.id_transaction }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirmar Exclusão</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-1">Deseja excluir a transação:</p>
+                            <p class="mb-0 p-3 rounded bg-surface-subtle">
+                                <strong>{{ transaction.description }}</strong><br>
+                                <span class="text-muted small">{{ transaction.date|date:"d/m/Y" }}</span> ·
+                                <span class="{% if transaction.transaction_type == 'receita' %}text-success{% else %}text-danger{% endif %} small fw-semibold">
+                                    R$ {{ transaction.value|floatformat:2 }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                            <form method="post" action="{% url 'transactions:delete' transaction.id_transaction %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash me-1"></i>Excluir
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
         {% else %}
-            <div class="card-body text-center py-5">
-                <i class="bi bi-receipt text-muted" style="font-size: 4rem;"></i>
-                <h4 class="mt-3">Nenhuma transação encontrada</h4>
-                <p class="text-muted">Registre suas receitas e despesas para acompanhar suas finanças.</p>
-                <a href="{% url 'transactions:create' %}" class="btn btn-primary">
-                    <i class="bi bi-plus-lg me-1"></i>Nova Transação
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="bi bi-receipt"></i></div>
+                <h4>Nenhuma transação encontrada</h4>
+                <p>Registre suas receitas e despesas para acompanhar suas finanças.</p>
+                <a href="{% url 'transactions:create' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg"></i>Nova Transação
                 </a>
             </div>
         {% endif %}
     </div>
+
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Ativar tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
 </script>
 {% endblock %}

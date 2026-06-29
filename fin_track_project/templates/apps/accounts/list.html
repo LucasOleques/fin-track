@@ -1,89 +1,88 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Minhas Contas - FinTrack{% endblock %}
+{% block title %}Minhas Contas – FinTrack{% endblock %}
 
 {% block content %}
 {% load l10n %}
-<div class="container py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container py-2">
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-3">
         <div>
-            <h1 class="h3 mb-1">Minhas Contas</h1>
-            <p class="text-muted mb-0">Gerencie suas contas bancárias e cartões</p>
+            <h1 class="page-title">Minhas Contas</h1>
+            <p class="page-subtitle">Gerencie suas contas bancárias e cartões</p>
         </div>
-        <a href="{% url 'accounts:create' %}" class="btn btn-primary">Nova Conta</a>
-    </div>
-    
-    <!-- Filtros -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Buscar</label>
-                    <input type="text" class="form-control" name="bank"
-                           value="{{ filters.bank|default:'' }}" placeholder="Nome ou banco...">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Tipo</label>
-                    <select class="form-select" name="type">
-                        <option value="">Todos</option>
-                        <option value="corrente" {% if filters.type == 'corrente' %}selected{% endif %}>Conta Corrente</option>
-                        <option value="poupanca" {% if filters.type == 'poupanca' %}selected{% endif %}>Poupança</option>
-                        <option value="cartao" {% if filters.type == 'cartao' %}selected{% endif %}>Cartão de Crédito</option>
-                        <option value="investimento" {% if filters.type == 'investimento' %}selected{% endif %}>Investimento</option>
-                        <option value="carteira" {% if filters.type == 'carteira' %}selected{% endif %}>Dinheiro Físico</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" name="is_active">
-                        <option value="">Todos</option>
-                        <option value="True" {% if filters.is_active == 'True' %}selected{% endif %}>Ativas</option>
-                        <option value="False" {% if filters.is_active == 'False' %}selected{% endif %}>Inativas</option>
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-outline-primary flex-grow-1">
-                        <i class="bi bi-search me-1"></i>Filtrar
-                    </button>
-                    <a href="{% url 'accounts:list' %}" class="btn btn-outline-secondary flex-grow-1">
-                        <i class="bi bi-x-lg"></i>
-                    </a>
-                </div>
-            </form>
-        </div>
+        <a href="{% url 'accounts:create' %}" class="btn btn-primary flex-shrink-0">
+            <i class="bi bi-plus-lg"></i>Nova Conta
+        </a>
     </div>
 
-    <div class="mb-3 d-flex justify-content-between align-items-center">
-        <div>
-            <span>Total: <strong>{{ total_accounts }} contas</strong></span>
-        </div>
-        <div class="d-flex gap-2">
+    <div class="filter-section">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-sm-6 col-md-4">
+                <label class="form-label">Buscar</label>
+                <input type="text" class="form-control form-control-sm" name="bank"
+                       value="{{ filters.bank|default:'' }}" placeholder="Nome ou banco...">
+            </div>
+            <div class="col-sm-6 col-md-3">
+                <label class="form-label">Tipo</label>
+                <select class="form-select form-select-sm" name="type">
+                    <option value="">Todos</option>
+                    <option value="corrente"    {% if filters.type == 'corrente' %}selected{% endif %}>Conta Corrente</option>
+                    <option value="poupanca"    {% if filters.type == 'poupanca' %}selected{% endif %}>Poupança</option>
+                    <option value="cartao"      {% if filters.type == 'cartao' %}selected{% endif %}>Cartão de Crédito</option>
+                    <option value="investimento"{% if filters.type == 'investimento' %}selected{% endif %}>Investimento</option>
+                    <option value="carteira"    {% if filters.type == 'carteira' %}selected{% endif %}>Dinheiro Físico</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-2">
+                <label class="form-label">Status</label>
+                <select class="form-select form-select-sm" name="is_active">
+                    <option value="">Todos</option>
+                    <option value="True"  {% if filters.is_active == 'True' %}selected{% endif %}>Ativas</option>
+                    <option value="False" {% if filters.is_active == 'False' %}selected{% endif %}>Inativas</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-search"></i>Filtrar
+                </button>
+                <a href="{% url 'accounts:list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <span class="text-muted text-sm">
+            Total: <strong class="text-dark">{{ total_accounts }} contas</strong>
+        </span>
+        <div class="d-flex gap-2 flex-wrap">
             <div>
                 <a href="{% url 'accounts:list' %}?export=csv" class="btn btn-outline-success btn-sm">
-                    <i class="bi bi-file-earmark-spreadsheet me-1"></i>Exportar CSV
+                    <i class="bi bi-file-earmark-spreadsheet"></i>CSV
                 </a>
                 <a href="{% url 'accounts:list' %}?export=pdf" class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF
+                    <i class="bi bi-file-earmark-pdf"></i>PDF
                 </a>
             </div>
-            <div class="btn-group" role="group">
-                <a href="{% url 'accounts:list' %}?view=list" class="btn btn-outline-secondary btn-sm {% if view_mode == 'list' %}active{% endif %}">
-                    <i class="bi bi-list me-1"></i>Lista
+            <div class="btn-group btn-group-sm" role="group">
+                <a href="{% url 'accounts:list' %}?view=list"
+                   class="btn btn-outline-secondary {% if view_mode == 'list' %}active{% endif %}">
+                    <i class="bi bi-list"></i>Lista
                 </a>
-                <a href="{% url 'accounts:list' %}?view=grid" class="btn btn-outline-secondary btn-sm {% if view_mode == 'grid' %}active{% endif %}">
-                    <i class="bi bi-grid me-1"></i>Grade
+                <a href="{% url 'accounts:list' %}?view=grid"
+                   class="btn btn-outline-secondary {% if view_mode == 'grid' %}active{% endif %}">
+                    <i class="bi bi-grid"></i>Grade
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Lista de Contas -->
     {% if accounts %}
         {% if view_mode == 'grid' %}
-        <!-- Visualização em Grade -->
-        <div class="row g-4">
+        <div class="row g-3">
             {% for account in accounts %}
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 account-card {% if not account.is_active %}opacity-50{% endif %}">
@@ -109,7 +108,7 @@
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <a class="dropdown-item text-danger" href="#" 
+                                        <a class="dropdown-item text-danger" href="#"
                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ account.id_account }}">
                                             <i class="bi bi-trash me-2"></i>Excluir
                                         </a>
@@ -117,62 +116,32 @@
                                 </ul>
                             </div>
                         </div>
-                        
-                        <h5 class="card-title mb-1">{{ account.name }}</h5>
-                        <p class="text-muted small mb-3">{{ account.bank }}</p>
-                        
+
+                        <h5 class="fw-semibold mb-1">{{ account.name }}</h5>
+                        <p class="text-muted text-sm mb-3">{{ account.bank }}</p>
+
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-{{ account.account_color }}">
-                                {{ account.get_type_display }}
-                            </span>
-                            <h4 class="mb-0 {% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            <span class="badge bg-{{ account.account_color }}">{{ account.get_type_display }}</span>
+                            <span class="fw-bold {% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %}">
                                 R$ {{ account.balance|floatformat:2 }}
-                            </h4>
+                            </span>
                         </div>
-                        
+
                         {% if account.credit_limit %}
                         <div class="mt-3">
-                            <small class="text-muted">Limite disponível:</small>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-{{ account.account_color }}" style="width: {{ account.used_percent|default:'0' }}%">
-                                </div>
+                            <small class="text-muted">Limite disponível</small>
+                            <div class="progress mt-1" style="height:5px;border-radius:10px;">
+                                <div class="progress-bar bg-{{ account.account_color }}"
+                                     style="width:{{ account.used_percent|default:'0' }}%"></div>
                             </div>
-                            <small class="text-muted">R$ {{ account.balance|floatformat:2 }} de R$ {{ account.credit_limit|floatformat:2 }}</small>
+                            <small class="text-muted">R$ {{ account.balance|floatformat:2 }} / R$ {{ account.credit_limit|floatformat:2 }}</small>
                         </div>
                         {% endif %}
                     </div>
-                    <div class="card-footer bg-transparent">
+                    <div class="card-footer">
                         <a href="{% url 'accounts:detail' account.id_account %}" class="btn btn-outline-primary btn-sm w-100">
-                            <i class="bi bi-arrow-right me-1"></i>Ver Transações
+                            <i class="bi bi-arrow-right"></i>Ver Transações
                         </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal de Exclusão -->
-            <div class="modal fade" id="deleteModal{{ account.id_account }}" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Confirmar Exclusão</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Tem certeza que deseja excluir a conta <strong>{{ account.name }}</strong>?</p>
-                            <p class="text-danger small">
-                                <i class="bi bi-exclamation-triangle me-1"></i>
-                                Todas as transações associadas serão excluídas permanentemente.
-                            </p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <form method="post" action="{% url 'accounts:delete' account.id_account %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="bi bi-trash me-1"></i>Excluir
-                                </button>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -180,111 +149,120 @@
         </div>
 
         {% else %}
-        <!-- Visualização em Lista (padrão) -->
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 5%"></th>
-                        <th style="width: 20%">Nome</th>
-                        <th style="width: 15%">Banco</th>
-                        <th style="width: 12%">Tipo</th>
-                        <th style="width: 15%">Saldo</th>
-                        <th style="width: 10%">Status</th>
-                        <th style="width: 23%">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for account in accounts %}
-                    <tr class="{% if not account.is_active %}opacity-50{% endif %}">
-                        <td>
-                            <div class="account-icon bg-{{ account.account_color|default:'primary' }} text-white" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-                                <i class="bi bi-{{ account.icon|default:'bank' }}"></i>
-                            </div>
-                        </td>
-                        <td>
-                            <strong>{{ account.name }}</strong>
-                        </td>
-                        <td>{{ account.bank }}</td>
-                        <td>
-                            <span class="badge bg-{{ account.account_color }}">
-                                {{ account.get_type_display }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="{% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %} fw-semibold">
-                                R$ {{ account.balance|floatformat:2 }}
-                            </span>
-                            {% if account.credit_limit %}
-                            <br>
-                            <small class="text-muted">Limite: R$ {{ account.credit_limit|floatformat:2 }}</small>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if account.is_active %}
-                            <span class="badge bg-success">Ativa</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Inativa</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <a href="{% url 'accounts:detail' account.id_account %}" class="btn btn-outline-primary" title="Ver detalhes">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{% url 'accounts:edit' account.id_account %}" class="btn btn-outline-warning" title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <button type="button" class="btn btn-outline-danger" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal{{ account.id_account }}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Modal de Exclusão -->
-                    <div class="modal fade" id="deleteModal{{ account.id_account }}" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Confirmar Exclusão</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width:44px;"></th>
+                            <th>Nome</th>
+                            <th>Banco</th>
+                            <th>Tipo</th>
+                            <th>Saldo</th>
+                            <th>Status</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in accounts %}
+                        <tr class="{% if not account.is_active %}opacity-50{% endif %}">
+                            <td>
+                                <div class="account-icon account-icon-md bg-{{ account.account_color|default:'primary' }} text-white">
+                                    <i class="bi bi-{{ account.icon|default:'bank' }}"></i>
                                 </div>
-                                <div class="modal-body">
-                                    <p>Tem certeza que deseja excluir a conta <strong>{{ account.name }}</strong>?</p>
-                                    <p class="text-danger small">
-                                        <i class="bi bi-exclamation-triangle me-1"></i>
-                                        Todas as transações associadas serão excluídas permanentemente.
-                                    </p>
+                            </td>
+                            <td><span class="fw-semibold">{{ account.name }}</span></td>
+                            <td class="text-muted">{{ account.bank }}</td>
+                            <td>
+                                <span class="badge bg-{{ account.account_color }}">{{ account.get_type_display }}</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold {% if account.balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    R$ {{ account.balance|floatformat:2 }}
+                                </span>
+                                {% if account.credit_limit %}
+                                <br><small class="text-muted">Limite: R$ {{ account.credit_limit|floatformat:2 }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if account.is_active %}
+                                    <span class="badge badge-active">Ativa</span>
+                                {% else %}
+                                    <span class="badge badge-inactive">Inativa</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'accounts:detail' account.id_account %}" class="btn btn-outline-primary" title="Ver detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'accounts:edit' account.id_account %}" class="btn btn-outline-secondary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" title="Excluir"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ account.id_account }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <form method="post" action="{% url 'accounts:delete' account.id_account %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="bi bi-trash me-1"></i>Excluir
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                {% include 'components/pagination.html' %}
+            </div>
+            {% endif %}
         </div>
         {% endif %}
 
-        {% include 'components/pagination.html' %}
+        {% if view_mode == 'grid' %}
+            {% include 'components/pagination.html' %}
+        {% endif %}
+
+        {% for account in accounts %}
+        <div class="modal fade" id="deleteModal{{ account.id_account }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir a conta <strong>{{ account.name }}</strong>?</p>
+                        <div class="alert alert-danger small mb-0">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            Todas as transações associadas serão excluídas permanentemente.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                        <form method="post" action="{% url 'accounts:delete' account.id_account %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash me-1"></i>Excluir
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
     {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-bank text-muted" style="font-size: 4rem;"></i>
-            <h4 class="mt-3">Nenhuma conta encontrada</h4>
-            <p class="text-muted">Comece adicionando sua primeira conta bancária ou cartão.</p>
-            <a href="{% url 'accounts:create' %}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1"></i>Adicionar Conta
-            </a>
+        <div class="card">
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="bi bi-bank"></i></div>
+                <h4>Nenhuma conta encontrada</h4>
+                <p>Comece adicionando sua primeira conta bancária ou cartão.</p>
+                <a href="{% url 'accounts:create' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg"></i>Adicionar Conta
+                </a>
+            </div>
         </div>
     {% endif %}
+
 </div>
 {% endblock %}

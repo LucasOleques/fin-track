@@ -1,113 +1,111 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if transaction %}Editar{% else %}Nova{% endif %} Transação - FinTrack{% endblock %}
+{% block title %}{% if transaction %}Editar{% else %}Nova{% endif %} Transação – FinTrack{% endblock %}
 
 {% block content %}
 {% load l10n %}
-<div class="container py-4">
+<div class="container py-2">
     <div class="row justify-content-center">
         <div class="col-lg-6">
+
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'transactions:list' %}">Transações</a></li>
+                    <li class="breadcrumb-item active">
+                        {% if transaction %}Editar{% else %}Nova{% endif %}
+                    </li>
+                </ol>
+            </nav>
+
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-{% if transaction %}pencil{% else %}plus-lg{% endif %} me-2"></i>
+                    <span class="d-flex align-items-center gap-2">
+                        <i class="bi bi-{% if transaction %}pencil{% else %}plus-circle{% endif %} text-primary"></i>
                         {% if transaction %}Editar Transação{% else %}Nova Transação{% endif %}
-                    </h5>
+                    </span>
                 </div>
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
-                        
+
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger">
                                 {% for error in form.non_field_errors %}{{ error }}{% endfor %}
                             </div>
                         {% endif %}
-                        
-                        <!-- Tipo de Transação -->
+
                         <div class="mb-4">
-                            <label class="form-label">Tipo *</label>
+                            <label class="form-label">Tipo <span class="text-danger">*</span></label>
                             <div class="btn-group w-100" role="group">
-                                <input type="radio" class="btn-check" name="transaction_type" id="id_transaction_type_despesa" 
-                                       value="despesa" {% if transaction.transaction_type == 'despesa' or not transaction %}checked{% endif %} required>
+                                <input type="radio" class="btn-check" name="transaction_type"
+                                       id="id_transaction_type_despesa" value="despesa"
+                                       {% if transaction.transaction_type == 'despesa' or not transaction %}checked{% endif %} required>
                                 <label class="btn btn-outline-danger" for="id_transaction_type_despesa">
-                                    <i class="bi bi-arrow-down-circle me-1"></i>Despesa
-                                </label>
-                                
-                                <input type="radio" class="btn-check" name="transaction_type" id="id_transaction_type_receita" 
-                                       value="receita" {% if transaction.transaction_type == 'receita' %}checked{% endif %} required>
-                                <label class="btn btn-outline-success" for="id_transaction_type_receita">
-                                    <i class="bi bi-arrow-up-circle me-1"></i>Receita
+                                    <i class="bi bi-arrow-down-circle"></i>Despesa
                                 </label>
 
+                                <input type="radio" class="btn-check" name="transaction_type"
+                                       id="id_transaction_type_receita" value="receita"
+                                       {% if transaction.transaction_type == 'receita' %}checked{% endif %} required>
+                                <label class="btn btn-outline-success" for="id_transaction_type_receita">
+                                    <i class="bi bi-arrow-up-circle"></i>Receita
+                                </label>
                             </div>
                         </div>
-                        
-                        <!-- Valor -->
+
                         <div class="mb-3">
-                            <label for="id_value" class="form-label">Valor *</label>
+                            <label for="id_value" class="form-label">Valor <span class="text-danger">*</span></label>
                             <div class="input-group input-group-lg">
-                                <span class="input-group-text">R$</span>
-                                <input type="number" 
-                                       class="form-control {% if form.value.errors %}is-invalid{% endif %}" 
-                                       id="id_value" 
-                                       name="value" 
+                                <span class="input-group-text fw-semibold">R$</span>
+                                <input type="number"
+                                       class="form-control {% if form.value.errors %}is-invalid{% endif %}"
+                                       id="id_value" name="value"
                                        value="{{ transaction.value|unlocalize|default:'' }}"
-                                       step="0.01"
-                                       placeholder="0,00"
-                                       min="0.00"
-                                       required>
+                                       step="0.01" min="0.00" placeholder="0,00" required>
+                                {% if form.value.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.value.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
-                            {% if form.value.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.value.errors %}{{ error }}{% endfor %}
-                                </div>
-                            {% endif %}
                         </div>
-                        
-                        <!-- Descrição -->
+
                         <div class="mb-3">
-                            <label for="id_description" class="form-label">Descrição *</label>
-                            <input type="text" 
-                                   class="form-control {% if form.description.errors %}is-invalid{% endif %}" 
-                                   id="id_description" 
-                                   name="description" 
+                            <label for="id_description" class="form-label">Descrição <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                   id="id_description" name="description"
                                    value="{{ transaction.description|default:'' }}"
-                                   placeholder="Ex: Supermercado, Salário, Aluguel..."
-                                   required>
+                                   placeholder="Ex: Supermercado, Salário, Aluguel..." required>
                             {% if form.description.errors %}
                                 <div class="invalid-feedback">
                                     {% for error in form.description.errors %}{{ error }}{% endfor %}
                                 </div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="row">
-                            <!-- Data -->
                             <div class="col-md-6 mb-3">
-                                <label for="id_date" class="form-label">Data *</label>
-                                <input type="date" 
-                                       class="form-control {% if form.date.errors %}is-invalid{% endif %}" 
-                                       id="id_date" 
-                                       name="date" 
-                                       value="{{ transaction.date|date:'Y-m-d' }}"
-                                       required>
+                                <label for="id_date" class="form-label">Data <span class="text-danger">*</span></label>
+                                <input type="date"
+                                       class="form-control {% if form.date.errors %}is-invalid{% endif %}"
+                                       id="id_date" name="date"
+                                       value="{{ transaction.date|date:'Y-m-d' }}" required>
                                 {% if form.date.errors %}
                                     <div class="invalid-feedback">
                                         {% for error in form.date.errors %}{{ error }}{% endfor %}
                                     </div>
                                 {% endif %}
                             </div>
-                            
-                            <!-- Conta -->
+
                             <div class="col-md-6 mb-3">
-                                <label for="id_account" class="form-label">Conta *</label>
-                                <select class="form-select {% if form.account.errors %}is-invalid{% endif %}" 
+                                <label for="id_account" class="form-label">Conta <span class="text-danger">*</span></label>
+                                <select class="form-select {% if form.account.errors %}is-invalid{% endif %}"
                                         id="id_account" name="account" required>
                                     <option value="">Selecione...</option>
                                     {% for account in accounts %}
-                                        <option value="{{ account.id_account }}" 
+                                        <option value="{{ account.id_account }}"
                                                 {% if transaction.account.id_account == account.id_account %}selected{% endif %}>
                                             {{ account.name }} ({{ account.get_type_display }})
                                         </option>
@@ -120,14 +118,13 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- Categoria -->
+
                         <div class="mb-3">
                             <label for="id_category" class="form-label">Categoria</label>
                             <select class="form-select" id="id_category" name="category">
                                 <option value="">Sem categoria</option>
                                 {% for category in categories %}
-                                    <option value="{{ category.id_category }}" 
+                                    <option value="{{ category.id_category }}"
                                             data-type="{{ category.type }}"
                                             {% if transaction.category and transaction.category.id_category == category.id_category %}selected{% endif %}>
                                         {{ category.name }} ({{ category.get_type_display }})
@@ -140,33 +137,30 @@
                                 </a>
                             </div>
                         </div>
-                        
-                        <!-- Método de Pagamento -->
+
                         <div class="mb-3">
                             <label for="id_payment_method" class="form-label">Método de Pagamento</label>
                             <select class="form-select" id="id_payment_method" name="payment_method">
                                 <option value="">Não informado</option>
-                                <option value="dinheiro" {% if transaction.payment_method == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
-                                <option value="cartao_debito" {% if transaction.payment_method == 'cartao_debito' %}selected{% endif %}>Débito</option>
-                                <option value="cartao_credito" {% if transaction.payment_method == 'cartao_credito' %}selected{% endif %}>Crédito</option>
-                                <option value="pix" {% if transaction.payment_method == 'pix' %}selected{% endif %}>PIX</option>
-                                <option value="boleto" {% if transaction.payment_method == 'boleto' %}selected{% endif %}>Boleto</option>
-                                <option value="transferencia" {% if transaction.payment_method == 'transferencia' %}selected{% endif %}>Transferência</option>
-                                <option value="outros" {% if transaction.payment_method == 'outros' %}selected{% endif %}>Outros</option>
+                                <option value="dinheiro"        {% if transaction.payment_method == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
+                                <option value="cartao_debito"   {% if transaction.payment_method == 'cartao_debito' %}selected{% endif %}>Débito</option>
+                                <option value="cartao_credito"  {% if transaction.payment_method == 'cartao_credito' %}selected{% endif %}>Crédito</option>
+                                <option value="pix"             {% if transaction.payment_method == 'pix' %}selected{% endif %}>PIX</option>
+                                <option value="boleto"          {% if transaction.payment_method == 'boleto' %}selected{% endif %}>Boleto</option>
+                                <option value="transferencia"   {% if transaction.payment_method == 'transferencia' %}selected{% endif %}>Transferência</option>
+                                <option value="outros"          {% if transaction.payment_method == 'outros' %}selected{% endif %}>Outros</option>
                             </select>
                         </div>
-                        
-                        <!-- Observações -->
+
                         <div class="mb-4">
                             <label for="id_notes" class="form-label">Observações</label>
                             <textarea class="form-control" id="id_notes" name="notes" rows="2"
                                       placeholder="Notas adicionais (opcional)">{{ transaction.notes|default:'' }}</textarea>
                         </div>
-                        
-                        <!-- Botões -->
+
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg me-1"></i>
+                                <i class="bi bi-check-lg"></i>
                                 {% if transaction %}Salvar{% else %}Registrar{% endif %}
                             </button>
                             <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">
@@ -176,11 +170,11 @@
                     </form>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
 {% endblock %}
-
 
 {% block extra_js %}
     <script src="{% static 'js/apps/transactions/create_edit.js' %}"></script>
